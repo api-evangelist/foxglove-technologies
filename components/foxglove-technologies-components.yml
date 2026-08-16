@@ -1,0 +1,74 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/docs/embed, https://docs.foxglove.dev/docs/embed/foxglove-embed,
+  https://docs.foxglove.dev/docs/embed/foxglove-embed-react,
+  https://docs.foxglove.dev/docs/extensions
+note: >-
+  Foxglove ships two distinct client-side surfaces: an EMBEDDABLE VIEWER (drop the
+  Foxglove app into your own web application) and an EXTENSION API (write custom
+  panels and converters that run inside Foxglove). Both are client-side and distinct
+  from the server-side SDKs catalogued in packages/.
+families:
+- family: Embedded viewer
+  description: >-
+    Embeds the Foxglove visualization app in a host web application via a managed
+    iframe. Requires a secure context — the host page must be served over HTTPS or
+    from localhost.
+  default_loader_origin: https://embed.foxglove.dev/
+  self_hosted: >-
+    A fully self-hosted embedded viewer is supported by pointing the `src` option at
+    your own deployment; extensions hosted on Foxglove's servers are not reachable in
+    that mode, and installExtensions() is only supported in the fully self-hosted
+    viewer.
+  docs: https://docs.foxglove.dev/docs/embed
+  components:
+  - name: FoxgloveViewer
+    kind: class
+    package: '@foxglove/embed'
+    registry: npm
+    version: 0.64.0
+    published: '2026-08-13'
+    constructor: 'new FoxgloveViewer(options: FoxgloveViewerOptions)'
+    capabilities:
+    - set data sources
+    - set and manage layouts
+    - control playback
+    - installExtensions() (self-hosted viewer only)
+    docs: https://docs.foxglove.dev/docs/embed/foxglove-embed
+  - name: '@foxglove/embed-react'
+    kind: react-bindings
+    package: '@foxglove/embed-react'
+    registry: npm
+    version: 0.64.0
+    published: '2026-08-13'
+    docs: https://docs.foxglove.dev/docs/embed/foxglove-embed-react
+  sdks:
+  - name: TypeScript SDK
+    docs: https://docs.foxglove.dev/docs/embed/typescript-sdk
+  - name: React SDK
+    docs: https://docs.foxglove.dev/docs/embed/react-sdk
+- family: Extensions (in-app panels)
+  description: >-
+    Custom panels, message converters, topic converters and data loaders that run
+    inside the Foxglove app. Published to an organization privately, or to the public
+    extension registry.
+  docs: https://docs.foxglove.dev/docs/extensions
+  registry: https://github.com/foxglove/extension-registry
+  components:
+  - name: '@foxglove/extension'
+    kind: authoring-api
+    registry: npm
+    version: 2.59.0
+    published: '2026-08-04'
+    entry_points: [ExtensionContext, ExtensionModule, PanelExtensionContext,
+      LayoutActions, SettingsTree]
+    docs: https://docs.foxglove.dev/docs/extensions/extension-api
+  - name: create-foxglove-extension
+    kind: scaffolding
+    registry: npm
+    version: 1.3.2
+    published: '2026-05-14'
+    install: npx create-foxglove-extension@latest
+  publishing:
+    rest: [POST /extension-upload, GET /extensions, 'DELETE /extensions/{id}']
+    cli: foxglove extensions publish

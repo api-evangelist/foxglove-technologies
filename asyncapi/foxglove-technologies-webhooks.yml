@@ -1,0 +1,103 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/docs/webhooks,
+  https://docs.foxglove.dev/docs/webhooks/getting-started,
+  https://docs.foxglove.dev/docs/webhooks/security,
+  openapi/foxglove-technologies-openapi-original.yml (#/components/schemas/webhook_payloads)
+spec_type: Webhooks
+asyncapi_published: false
+asyncapi_note: >-
+  Foxglove publishes NO AsyncAPI document. The event surface is real and
+  machine-describable — eight event types with typed payload schemas that already
+  live in the OpenAPI under components.schemas.webhook_payloads — but there is no
+  /asyncapi.yaml, no event catalog page, and no channel bindings. Nothing has been
+  fabricated here: the catalog below is transcribed from Foxglove's own webhook
+  documentation and its own payload schemas.
+transport: https
+delivery:
+  guarantee: at-least-once
+  retries: up to 5 automatic retries with an increasing delay between attempts
+  consumer_timeout_seconds: 5
+  expected_response: 2xx
+  deduplication_keys: [webhookId, webhookEventId]
+  replay_guard: >-
+    Reject deliveries whose `deliveryAttemptedAt` is older than 1 minute to defeat
+    replay of a captured payload.
+security:
+  signature_header: fg-webhook-signature
+  algorithm: HMAC-SHA256
+  signed_content: the entire request body bytes
+  secret: the webhook token issued with the webhook
+  docs: https://docs.foxglove.dev/docs/webhooks/security
+envelope:
+  content_type: application/json
+  schema: '#/components/schemas/webhook_payloads/Common'
+  fields:
+  - {name: type, type: string, description: The event type}
+  - {name: timestamp, type: string, format: date-time, description: When the webhook
+      event occurred}
+  - {name: attemptedAt, type: string, format: date-time, description: When the
+      delivery was attempted}
+  - {name: webhookEventId, type: string, description: ID of the associated webhook
+      event}
+  - {name: webhookId, type: string, description: ID of the webhook that notified
+      your endpoint}
+  required: [type, timestamp, attemptedAt, webhookId, webhookEventId]
+events:
+- name: recording.created
+  description: Occurs when a recording is created. For direct uploads this occurs at
+    the same time as recording.imported.
+  payload_schema: '#/components/schemas/webhook_payloads/RecordingCreated'
+  resource: Recording
+- name: recording.imported
+  description: Occurs when a recording finishes importing.
+  payload_schema: '#/components/schemas/webhook_payloads/RecordingImported'
+  resource: Recording
+- name: session.created
+  description: Occurs when a new Session is created. Sessions group recordings from
+    a single device.
+  payload_schema: '#/components/schemas/webhook_payloads/SessionCreated'
+  resource: RecordingSession
+- name: device.created
+  description: Occurs when a new Device is added to your organization.
+  payload_schema: '#/components/schemas/webhook_payloads/DeviceCreated'
+  resource: Device
+- name: device.updated
+  description: Occurs when a Device is updated.
+  payload_schema: '#/components/schemas/webhook_payloads/DeviceUpdated'
+  resource: Device
+- name: event.created
+  description: Occurs when a new Event is added to your organization.
+  payload_schema: '#/components/schemas/webhook_payloads/EventCreated'
+  resource: Event
+- name: event.updated
+  description: Occurs when an Event is updated.
+  payload_schema: '#/components/schemas/webhook_payloads/EventUpdated'
+  resource: Event
+- name: ping
+  description: Ping event for debugging webhook endpoint connectivity.
+  payload_schema: '#/components/schemas/webhook_payloads/Ping'
+  resource: null
+availability:
+  plans: [Pro, Enterprise, Academic]
+  note: Webhooks are listed as an included feature on the Pro and Academic tiers on
+    https://foxglove.dev/pricing.
+other_event_surfaces:
+- name: Foxglove WebSocket protocol
+  description: >-
+    A live streaming protocol (not a webhook surface) used by ros-foxglove-bridge,
+    the SDKs and the app to stream messages from a running robot into Foxglove.
+  spec: https://github.com/foxglove/ws-protocol
+  package: '@foxglove/ws-protocol'
+- name: Site bucket notifications
+  description: >-
+    POST /site-bucket-notifications is an INBOUND notification endpoint — cloud
+    object storage notifies Foxglove that a new recording landed in a self-hosted
+    Primary Site bucket. It is the one route that does not require an API key,
+    authenticating instead with a site inbox notification bearer token.
+  rest: POST /site-bucket-notifications
+recommendation: >-
+  An AsyncAPI 3.0 document is close to free here: the eight event names, the shared
+  Common envelope, the HMAC-SHA256 signature binding and the typed payload schemas
+  are already published — they are simply spread across the webhooks docs and the
+  OpenAPI components rather than assembled into one machine-readable event contract.

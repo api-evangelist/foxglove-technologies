@@ -1,0 +1,131 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/foxglove-technologies-openapi-original.yml, https://foxglove.dev/security,
+  https://docs.foxglove.dev/api, https://docs.foxglove.dev/docs/webhooks/security
+standards:
+- id: openapi-3.1
+  conforms: true
+  evidence: openapi/foxglove-technologies-openapi-original.yml declares openapi 3.1.0
+    with 45 paths / 73 operations, published at
+    https://docs.foxglove.dev/redocusaurus/plugin-redoc-0.yaml
+- id: json-schema-2020-12
+  conforms: true
+  evidence: 50 Foxglove message schemas published as JSON Schema in json-schema/,
+    harvested from github.com/foxglove/foxglove-sdk/schemas/jsonschema
+- id: protobuf-proto3
+  conforms: true
+  evidence: 48 proto3 message definitions published in grpc/, harvested from
+    github.com/foxglove/foxglove-sdk/schemas/proto/foxglove
+- id: grpc
+  conforms: false
+  evidence: The published .proto files are message schemas only — no service
+    definitions and no gRPC endpoint
+- id: asyncapi
+  conforms: false
+  evidence: No AsyncAPI document published; the webhook event surface is documented
+    in prose plus OpenAPI component schemas
+    (asyncapi/foxglove-technologies-webhooks.yml)
+- id: graphql
+  conforms: false
+  evidence: No GraphQL surface found on any Foxglove host
+- id: oauth2
+  conforms: false
+  evidence: No oauth2 securityScheme in the specification; API auth is an
+    admin-issued bearer API key
+- id: oidc
+  conforms: partial
+  evidence: Custom OIDC single sign-on is offered on the Enterprise tier for human
+    login to the application (https://docs.foxglove.dev/docs/security/sso); no
+    OIDC discovery document is served and OIDC does not issue API credentials
+- id: rfc6750-bearer-token
+  conforms: true
+  evidence: 'Authorization: Bearer <token> on every authenticated route'
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    Errors use a flat JSON envelope with a single "error" string member, not
+    application/problem+json
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: No Sunset/Deprecation header commitment and no published deprecation
+    policy; deprecation is signalled only by deprecated:true on the Imports
+    operations
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 404 on every Foxglove host
+    (well-known/foxglove-technologies-well-known.yml)
+- id: rfc9727-api-catalog
+  conforms: false
+  evidence: /.well-known/api-catalog returns 404 on every Foxglove host
+- id: rfc3339-timestamps
+  conforms: true
+  evidence: All timestamp fields are RFC 3339 UTC "Zulu" with up to nine fractional
+    digits, stated in the API reference
+- id: rfc6585-429
+  conforms: true
+  evidence: Rate limiting is signalled with HTTP 429 and a Retry-After header
+- id: idempotency-key
+  conforms: false
+  evidence: No Idempotency-Key header or equivalent anywhere in the specification or
+    the documentation
+- id: hmac-sha256-webhook-signing
+  conforms: true
+  evidence: fg-webhook-signature carries a SHA-256 HMAC of the whole request body
+    keyed with the webhook token
+- id: mcp
+  conforms: true
+  evidence: Foxglove Desktop hosts a Model Context Protocol server on
+    http://127.0.0.1:7333/mcp with standard MCP tool annotations
+    (mcp/foxglove-technologies-mcp.yml); loopback-only, not an internet-reachable
+    endpoint
+- id: a2a
+  conforms: false
+  evidence: No agent card at /.well-known/agent-card.json or /.well-known/agent.json
+    on any host
+- id: llmstxt
+  conforms: true
+  evidence: llms.txt served at https://foxglove.dev/llms.txt and
+    https://docs.foxglove.dev/llms.txt, plus an API-specific
+    https://docs.foxglove.dev/api/llms.txt and llms-full.txt variants
+- id: mcap
+  conforms: true
+  evidence: Foxglove authors and maintains MCAP (https://mcap.dev), the open
+    container format the platform ingests; reference implementations in Go, Rust,
+    Python, TypeScript, C++, Swift
+- id: ros1
+  conforms: true
+  evidence: ROS 1 bag ingest and the ros-foxglove-bridge WebSocket bridge
+- id: ros2
+  conforms: true
+  evidence: ROS 2 support across the SDK, bridge and CDR/OMG IDL parsers
+- id: soc2-type-ii
+  conforms: true
+  evidence: '"Our security practices and policies have been independently verified
+    in a SOC 2 Type II audit." — https://foxglove.dev/security; report available on
+    request via support@foxglove.dev'
+- id: gdpr
+  conforms: true
+  evidence: '"We built our products from the ground up to properly handle all
+    personal data per GDPR guidelines." — https://foxglove.dev/security; DPA at
+    https://foxglove.dev/legal/dpa'
+- id: iso-27001
+  conforms: false
+  evidence: Not claimed on the security page
+- id: hipaa
+  conforms: false
+  evidence: Not claimed
+- id: fedramp
+  conforms: false
+  evidence: Not claimed
+compliance_program:
+  published: true
+  url: https://foxglove.dev/security
+  certifications: [SOC 2 Type II, GDPR]
+  controls:
+  - HTTPS enforced on all connections; TLS 1.2 in transit
+  - AES-256 encryption at rest
+  - SSO / SAML authentication for the application
+  - Audit logging of account access, subscription and settings changes (audit logs
+    are an Enterprise feature — https://docs.foxglove.dev/docs/audit-logs)
+  - Infrastructure and network traffic monitoring for anomalies
+  dpa: https://foxglove.dev/legal/dpa

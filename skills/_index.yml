@@ -1,0 +1,29 @@
+generated: '2026-08-16'
+method: generated
+source: openapi/foxglove-technologies-openapi-original.yml + the Foxglove
+  documentation for data import, events, device tokens and webhooks
+note: >-
+  Foxglove publishes no AGENTS.md or provider-authored skill files, so these are
+  generated. The Foxglove OpenAPI declares NO operationIds on any of its 73
+  operations, so every skill grounds its steps in `METHOD /path` — the only
+  identifier the specification actually publishes. No operation, parameter or error
+  in these skills was invented; each appears verbatim in the harvested spec or the
+  provider's documentation.
+api: https://api.foxglove.dev/v1
+skills:
+- file: foxglove-technologies-upload-and-track-a-recording.md
+  name: Upload and track a Foxglove recording
+  api: openapi/foxglove-technologies-openapi-original.yml
+  operations: [POST /data/upload, GET /devices, GET /recordings, 'GET /recordings/{keyOrId}', GET /data/pending-imports, GET /data/import-errors, GET /data/coverage]
+- file: foxglove-technologies-annotate-data-with-events.md
+  name: Annotate Foxglove data with typed events
+  api: openapi/foxglove-technologies-openapi-original.yml
+  operations: [GET /event-types, POST /event-types, 'PATCH /event-types/{id}', GET /custom-properties, POST /custom-properties, GET /events, POST /events, 'GET /events/{id}', 'PATCH /events/{id}', 'DELETE /events/{id}']
+- file: foxglove-technologies-onboard-a-device-and-issue-tokens.md
+  name: Onboard a Foxglove device and issue its tokens
+  api: openapi/foxglove-technologies-openapi-original.yml
+  operations: [GET /projects, POST /devices, 'GET /devices/{nameOrId}', 'PATCH /devices/{nameOrId}', 'DELETE /devices/{nameOrId}', POST /device-tokens, GET /device-tokens, 'PATCH /device-tokens/{id}', 'DELETE /device-tokens/{id}', GET /custom-properties, 'POST /actions/devices/{nameOrId}/update-property-time-interval', 'GET /devices/{nameOrId}/property-time-intervals', GET /data/coverage]
+- file: foxglove-technologies-consume-webhooks-safely.md
+  name: Consume Foxglove webhooks safely
+  api: asyncapi/foxglove-technologies-webhooks.yml
+  operations: ['GET /recordings/{keyOrId}', 'GET /sessions/{keyOrId}', 'GET /devices/{nameOrId}', 'GET /events/{id}']

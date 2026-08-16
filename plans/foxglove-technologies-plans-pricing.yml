@@ -1,0 +1,82 @@
+generated: '2026-08-16'
+method: searched
+source: https://foxglove.dev/pricing
+currency: USD
+billing_period: monthly
+plan_count: 4
+note: >-
+  Foxglove publishes a public, self-serve pricing page with per-unit overage rates.
+  Quotas below are the included allowances stated on that page; the Enterprise tier
+  is quote-only. API access is not sold separately — the REST API, CLI and SDKs come
+  with every tier, and the tier governs storage, seats, devices, projects and
+  throughput. The local MCP server is the one developer surface gated by tier: it
+  requires a Pro, Enterprise or Academic plan and a developer seat.
+plans:
+- name: Free
+  price: 0
+  currency: USD
+  period: month
+  quotas:
+    storage: 10 GB
+    users: 3
+    devices: 5
+    projects: 1
+    query_time: 1 hour
+    indexing: 100 GB
+    bandwidth: 100 GB
+  overage: none — hard limits
+  note: Free forever.
+- name: Pro
+  price: 20
+  currency: USD
+  period: month
+  quotas:
+    storage: 1 TB included
+    developer_seats: 3 included
+    basic_seats: unlimited
+    devices: 5 included
+    projects: 3
+    query_time: 1 hour included
+    indexing: 1 TB included
+    bandwidth: 100 GB included
+  overage:
+    developer_seat: $42/user/mo beyond the 3 included
+    device: $20/device/mo beyond the 5 included
+    storage: usage-based beyond 1 TB
+    query_time: usage-based beyond the included hour
+    indexing: usage-based beyond 1 TB
+    bandwidth: usage-based beyond 100 GB
+  includes: [local MCP server, webhooks]
+- name: Enterprise
+  price: null
+  price_model: custom — contact sales
+  currency: USD
+  period: month
+  quotas:
+    storage: custom
+    users: custom
+    devices: custom
+    projects: unlimited
+    query_time: custom
+    indexing: custom
+    bandwidth: custom
+  features:
+  - self-hosted data (Primary Sites / Edge Sites)
+  - forward-deployed engineers
+  - custom OIDC
+  - SOC 2 report
+  - audit logs
+  - private support
+- name: Academic
+  price: 0
+  currency: USD
+  period: month
+  eligibility: requires a .edu or .ac email address
+  quotas:
+    storage: 1 TB
+    devices: 10
+    users: unlimited
+    bandwidth: 1 TB
+  features: [private extensions, webhooks, user scripts, events]
+signup: https://app.foxglove.dev/
+contact_sales: https://foxglove.dev/contact

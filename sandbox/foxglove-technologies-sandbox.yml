@@ -1,0 +1,45 @@
+generated: '2026-08-16'
+method: searched
+source: https://foxglove.dev/pricing, https://foxglove.dev/examples,
+  https://docs.foxglove.dev/docs/getting-started/explore-examples,
+  https://docs.foxglove.dev/docs/settings#api-keys
+test_live_separation: false
+note: >-
+  Foxglove publishes NO sandbox in the payments sense: there is no test-vs-live key
+  prefix (every key is `fox_sk_`), no test mode, no magic test identifiers, no test
+  clock, and no fixture/trigger tooling. What it does publish is a free-forever tier
+  and a public example-data gallery, which together are the trial surface a developer
+  actually uses before paying. Recorded honestly rather than dressed up as a sandbox.
+surfaces:
+- name: Example gallery
+  url: https://foxglove.dev/examples
+  http_status: 200
+  description: >-
+    Public datasets spanning autonomous vehicles, drones and robot arms, with
+    prebuilt layouts and 3D scenes, browsable without writing code. Also reachable
+    in-app from the command palette via "Getting started" > "Explore examples".
+  docs: https://docs.foxglove.dev/docs/getting-started/explore-examples
+- name: Free plan
+  url: https://foxglove.dev/pricing
+  description: >-
+    Free forever — 3 users, 10 GB storage, 5 devices, 1 project, 100 GB indexing and
+    bandwidth. Full REST API, CLI and SDK access; the local MCP server is the one
+    surface that requires a paid tier.
+  see: plans/foxglove-technologies-plans-pricing.yml
+- name: Web console
+  url: https://app.foxglove.dev/
+  description: >-
+    Where an organization admin creates and manages API keys and their capabilities
+    (Settings > API keys), and where devices, recordings, sessions and events are
+    managed by hand.
+  docs: https://docs.foxglove.dev/docs/settings#api-keys
+- name: Interactive API reference
+  url: https://docs.foxglove.dev/api
+  description: Redoc-rendered reference for the full 73-operation API surface.
+test_values: []
+test_clock: false
+fixtures: false
+gaps:
+- No test/sandbox mode or separate test credentials, so any integration exercise
+  writes to a real organization's data.
+- No published mock server or hosted try-it console that executes requests.

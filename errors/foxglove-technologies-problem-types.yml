@@ -1,0 +1,99 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/foxglove-technologies-openapi-original.yml + https://docs.foxglove.dev/api/llms.txt
+format: custom-json
+envelope:
+  media_type: application/json
+  schema: '#/components/schemas/Error'
+  shape: '{"error": "<human readable message>"}'
+  required: [error]
+  note: >-
+    Foxglove does NOT use RFC 9457 problem+json. There is no `type`, `title`,
+    `status`, `detail` or `instance` member and no machine-readable error code — the
+    entire error contract is a single free-text `error` string, so a client cannot
+    branch on an error identity without string matching. The status code is the only
+    machine-readable signal.
+statistics:
+  documented_responses: 85
+  success_2xx: 72
+  redirect_3xx: 1
+  client_4xx: 12
+  server_5xx: 0
+  note: >-
+    No operation in the published specification documents a 5xx response, and only
+    12 of 73 operations document any 4xx at all. 401 and 429 are documented in the
+    API reference prose but declared on no operation in the spec.
+problems:
+- status: 400
+  title: Bad request
+  description: Invalid request parameters. Documented on the deprecated bulk import
+    delete and on paginated collections where a `limit` greater than 2000 was
+    requested.
+  media_type: application/json
+  schema: Error
+  source_operations:
+  - DELETE /data/imports
+  - POST /data/stream
+  remediation: Correct the request parameters; keep `limit` at or below 2000.
+- status: 403
+  title: Forbidden
+  description: The presented API key lacks the capability the endpoint requires, or
+    the caller is not an organization admin.
+  media_type: application/json
+  schema: Error
+  source_operations:
+  - POST /extension-upload
+  - DELETE /extensions/{id}
+  - POST /site-bucket-notifications
+  remediation: Issue a key carrying the capability named in the endpoint's security
+    requirement (see authentication/foxglove-technologies-authentication.yml).
+- status: 404
+  title: Not found
+  description: The addressed resource does not exist, or is not visible to the
+    caller's organization/project.
+  media_type: application/json
+  schema: Error
+  source_operations:
+  - GET /extensions/{id}
+  - DELETE /extensions/{id}
+  - GET /layouts/{id}
+  - DELETE /layouts/{id}
+  remediation: Verify the id/key and the project scope of the API key.
+- status: 409
+  title: Conflict
+  description: The resource already exists or is in a state that forbids the
+    operation.
+  media_type: application/json
+  schema: Error
+  source_operations:
+  - POST /devices
+  - POST /sessions
+  - POST /custom-properties
+  remediation: Fetch the existing resource instead of recreating it.
+- status: 401
+  title: Unauthorized
+  description: Missing or invalid API key. Documented in the API reference
+    introduction rather than declared on any operation in the specification.
+  media_type: application/json
+  schema: Error
+  source_operations: []
+  source: https://docs.foxglove.dev/api
+  remediation: 'Send the header `Authorization: Bearer fox_sk_...`.'
+- status: 429
+  title: Too many requests
+  description: >-
+    "Requests to the API may be rate-limited. In this case, a request will receive a
+    status code of 429. Your client may refer to headers, such as Retry-After, to
+    determine when a request should be retried." Documented in the API reference
+    introduction; declared on no operation in the specification.
+  media_type: application/json
+  schema: Error
+  source_operations: []
+  source: https://docs.foxglove.dev/api/llms.txt
+  remediation: Back off using Retry-After and retry with exponential backoff.
+gaps:
+- No RFC 9457 problem+json and no stable error code vocabulary — errors are
+  free-text only.
+- 429 and 401 are described in prose but absent from every operation's responses
+  block, so a generated client will not model them.
+- No 5xx responses are documented anywhere in the specification.

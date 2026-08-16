@@ -1,0 +1,56 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/changelog, https://status.foxglove.dev/,
+  https://docs.foxglove.dev/api, openapi/foxglove-technologies-openapi-original.yml
+versioning:
+  scheme: uri-path
+  current: v1
+  base: https://api.foxglove.dev/v1
+  docs: https://docs.foxglove.dev/api
+  note: >-
+    The REST API is on a single unversioned-in-practice v1 path. Product releases
+    (the app, Foxlet, Primary Site, Remote Data Loader) are versioned independently
+    and semver-tagged in the changelog; the API surface is not separately versioned
+    or dated.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: unknown
+  deprecation_header: unknown
+  note: >-
+    Foxglove publishes NO written deprecation or sunset policy — no notice period, no
+    RFC 8594 Sunset/Deprecation header commitment. Deprecation is signalled only
+    inside the specification and the reference prose: the Imports tag carries
+    "**The Imports endpoints are deprecated. Use the Recordings endpoints instead.**"
+    and its three operations set `deprecated: true`.
+deprecated_operations:
+- operation: GET /data/imports
+  source: openapi/foxglove-technologies-openapi-original.yml
+  replacement: GET /recordings
+- operation: DELETE /data/imports
+  source: openapi/foxglove-technologies-openapi-original.yml
+  replacement: DELETE /recordings/{keyOrId}
+- operation: DELETE /data/imports/{importId}
+  source: openapi/foxglove-technologies-openapi-original.yml
+  replacement: DELETE /recordings/{keyOrId}
+status_page: https://status.foxglove.dev/
+status_page_provider: Atlassian Statuspage (also reachable at
+  https://foxglove.statuspage.io/)
+sla:
+  url: null
+  uptime_target: null
+  note: No public SLA or uptime target is published; Enterprise terms are contractual.
+changelog:
+  url: https://docs.foxglove.dev/changelog
+  feeds:
+  - https://docs.foxglove.dev/changelog/rss.xml
+  - https://docs.foxglove.dev/changelog/atom.xml
+  see: changelog/foxglove-technologies-changelog.yml
+support:
+  contact: https://foxglove.dev/contact
+  community: https://foxglove.dev/community
+  discord: https://discord.gg/vUVAdFmMFM
+gaps:
+- No published deprecation policy or notice window.
+- No Sunset/Deprecation header commitment (RFC 8594).
+- No public SLA.

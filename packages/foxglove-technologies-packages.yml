@@ -1,0 +1,204 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/api/llms.txt, https://docs.foxglove.dev/docs/sdk/introduction,
+  https://github.com/foxglove, and the public registry metadata endpoints for npm,
+  PyPI, crates.io and the Go module proxy
+note: >-
+  Versions and publication dates were read from the unauthenticated registry metadata
+  endpoints on 2026-08-16 (registry.npmjs.org, pypi.org/pypi/<pkg>/json,
+  crates.io/api/v1/crates/<pkg>, proxy.golang.org/<mod>/@latest). Foxglove ships two
+  distinct Python distributions: `foxglove-client` is the REST API client for the
+  Foxglove data platform, while `foxglove-sdk` is the recording/streaming SDK. The
+  MCAP packages are the open-source container format Foxglove created and maintains.
+packages:
+- language: python
+  registry: pypi
+  name: foxglove-client
+  url: https://pypi.org/project/foxglove-client/
+  install: pip install foxglove-client
+  source: https://github.com/foxglove/foxglove-python
+  official: true
+  role: REST API client for the Foxglove API (api.foxglove.dev/v1)
+  version: 0.19.2
+  published: '2026-04-16'
+- language: python
+  registry: pypi
+  name: foxglove-sdk
+  url: https://pypi.org/project/foxglove-sdk/
+  install: pip install foxglove-sdk
+  source: https://github.com/foxglove/foxglove-sdk
+  official: true
+  role: Foxglove SDK — logging, MCAP recording and live WebSocket streaming
+  version: 0.26.0
+  published: '2026-07-21'
+- language: python
+  registry: pypi
+  name: mcap
+  url: https://pypi.org/project/mcap/
+  install: pip install mcap
+  source: https://github.com/foxglove/mcap
+  official: true
+  role: MCAP container format reader/writer
+  version: 1.4.0
+  published: '2026-06-18'
+- language: rust
+  registry: crates.io
+  name: foxglove
+  url: https://crates.io/crates/foxglove
+  install: cargo add foxglove
+  source: https://github.com/foxglove/foxglove-sdk
+  official: true
+  role: Foxglove SDK for Rust
+  version: 0.26.0
+  published: '2026-07-21'
+- language: rust
+  registry: crates.io
+  name: mcap
+  url: https://crates.io/crates/mcap
+  install: cargo add mcap
+  source: https://github.com/foxglove/mcap
+  official: true
+  role: MCAP container format reader/writer for Rust
+  version: 0.25.0
+  published: '2026-06-11'
+- language: go
+  registry: pkg.go.dev
+  name: github.com/foxglove/foxglove-cli
+  url: https://pkg.go.dev/github.com/foxglove/foxglove-cli
+  install: go install github.com/foxglove/foxglove-cli/foxglove@latest
+  source: https://github.com/foxglove/foxglove-cli
+  official: true
+  role: Foxglove command line tool (see cli/foxglove-technologies-cli.yml)
+  version: v1.0.33
+  published: '2026-07-31'
+- language: go
+  registry: pkg.go.dev
+  name: github.com/foxglove/mcap/go/mcap
+  url: https://pkg.go.dev/github.com/foxglove/mcap/go/mcap
+  install: go get github.com/foxglove/mcap/go/mcap
+  source: https://github.com/foxglove/mcap
+  official: true
+  role: MCAP container format reader/writer for Go
+  version: v1.9.0
+  published: '2026-06-12'
+- language: javascript
+  registry: npm
+  name: '@foxglove/embed'
+  url: https://www.npmjs.com/package/@foxglove/embed
+  install: npm install @foxglove/embed
+  official: true
+  role: Embeddable Foxglove viewer (FoxgloveViewer iframe controller)
+  version: 0.64.0
+  published: '2026-08-13'
+- language: javascript
+  registry: npm
+  name: '@foxglove/embed-react'
+  url: https://www.npmjs.com/package/@foxglove/embed-react
+  install: npm install @foxglove/embed-react
+  official: true
+  role: React bindings for the embeddable Foxglove viewer
+  version: 0.64.0
+  published: '2026-08-13'
+- language: typescript
+  registry: npm
+  name: '@foxglove/extension'
+  url: https://www.npmjs.com/package/@foxglove/extension
+  install: npm install @foxglove/extension
+  official: true
+  role: Extension (custom panel / converter) authoring API
+  version: 2.59.0
+  published: '2026-08-04'
+- language: typescript
+  registry: npm
+  name: create-foxglove-extension
+  url: https://www.npmjs.com/package/create-foxglove-extension
+  install: npx create-foxglove-extension@latest
+  source: https://github.com/foxglove/create-foxglove-extension
+  official: true
+  role: Scaffolding tool for Foxglove extensions
+  version: 1.3.2
+  published: '2026-05-14'
+- language: typescript
+  registry: npm
+  name: '@foxglove/schemas'
+  url: https://www.npmjs.com/package/@foxglove/schemas
+  install: npm install @foxglove/schemas
+  source: https://github.com/foxglove/foxglove-sdk
+  official: true
+  role: Foxglove well-known message schemas (see json-schema/ and grpc/)
+  version: 2.1.0
+  published: '2026-06-05'
+- language: typescript
+  registry: npm
+  name: '@mcap/core'
+  url: https://www.npmjs.com/package/@mcap/core
+  install: npm install @mcap/core
+  source: https://github.com/foxglove/mcap
+  official: true
+  role: MCAP container format reader/writer for TypeScript
+  version: 2.2.1
+  published: '2026-04-24'
+- language: typescript
+  registry: npm
+  name: '@mcap/support'
+  url: https://www.npmjs.com/package/@mcap/support
+  install: npm install @mcap/support
+  source: https://github.com/foxglove/mcap
+  official: true
+  role: MCAP decompression / stream support helpers
+  version: 1.1.0
+  published: '2026-02-17'
+- language: typescript
+  registry: npm
+  name: '@foxglove/ws-protocol'
+  url: https://www.npmjs.com/package/@foxglove/ws-protocol
+  install: npm install @foxglove/ws-protocol
+  official: true
+  role: Foxglove WebSocket protocol implementation for live connections
+  version: 0.8.0
+  published: '2025-03-13'
+- language: typescript
+  registry: npm
+  name: '@foxglove/cdr'
+  url: https://www.npmjs.com/package/@foxglove/cdr
+  install: npm install @foxglove/cdr
+  source: https://github.com/foxglove/cdr
+  official: true
+  role: Common Data Representation (CDR) serialization for ROS 2 / DDS payloads
+  version: 3.5.1
+  published: '2026-05-25'
+- language: typescript
+  registry: npm
+  name: '@foxglove/rosmsg'
+  url: https://www.npmjs.com/package/@foxglove/rosmsg
+  install: npm install @foxglove/rosmsg
+  source: https://github.com/foxglove/ros-typescript
+  official: true
+  role: ROS 1 / ROS 2 message definition parser
+  version: 5.0.5
+  published: '2025-10-13'
+- language: typescript
+  registry: npm
+  name: '@foxglove/omgidl-parser'
+  url: https://www.npmjs.com/package/@foxglove/omgidl-parser
+  install: npm install @foxglove/omgidl-parser
+  source: https://github.com/foxglove/omgidl
+  official: true
+  role: OMG IDL schema parser
+  version: 1.2.2
+  published: '2025-10-13'
+- language: cpp
+  registry: null
+  name: foxglove-sdk (C++)
+  url: https://foxglove.github.io/foxglove-sdk/cpp/
+  source: https://github.com/foxglove/foxglove-sdk
+  official: true
+  role: Foxglove SDK for C++ / C, distributed as source and release archives from
+    GitHub rather than a package registry
+  version: null
+  published: null
+  note: No package-registry metadata endpoint exists for the C/C++ distribution —
+    it is released as GitHub release archives alongside the Rust/Python builds of
+    the same SDK, so no version/date could be read from a registry. The matching
+    Rust/Python releases in this file (0.26.0, 2026-07-21) are the closest dated
+    signal.

@@ -1,0 +1,20 @@
+generated: '2026-08-16'
+method: searched
+source: https://github.com/foxglove/foxglove-sdk/tree/main/schemas/proto/foxglove
+note: >-
+  48 proto3 files harvested verbatim from the Foxglove SDK repository, all in package
+  `foxglove`. IMPORTANT: these are MESSAGE definitions, not gRPC service definitions —
+  there is no `service` block and Foxglove exposes no gRPC endpoint. They are the
+  protobuf encoding of the same well-known Foxglove schemas published as JSON Schema
+  in json-schema/, used to log and stream robot data into Foxglove over MCAP or the
+  Foxglove WebSocket protocol.
+proto_count: 48
+syntax: proto3
+package: foxglove
+grpc_services: 0
+naming: 'foxglove-technologies-<message>.proto (source file: <Message>.proto)'
+docs: https://docs.foxglove.dev/docs/sdk/schemas
+related:
+- json-schema/_index.yml
+- https://mcap.dev
+- https://github.com/foxglove/ws-protocol

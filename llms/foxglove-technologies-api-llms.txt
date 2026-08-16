@@ -1,0 +1,215 @@
+# Foxglove REST API
+
+> The Foxglove REST API provides programmatic access to Foxglove including devices, recordings, events, and more.
+
+Base URL: https://api.foxglove.dev/v1
+
+Interactive documentation: https://docs.foxglove.dev/api
+
+For product documentation (visualization, panels, layouts, extensions, SDKs), see https://docs.foxglove.dev/llms.txt
+
+## Python client
+
+Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+[GitHub](https://github.com/foxglove/foxglove-python).
+
+## Authentication
+
+All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+Requests must include the API key in the `Authorization` header as a bearer token:
+
+```
+Authorization: Bearer fox_sk_1234...
+```
+
+Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+capability.
+
+## Sorting and pagination
+
+Some GET endpoints support sorting and pagination.
+
+Where supported, you will see the following
+query parameters in the endpoint documentation:
+
+* `sortBy` – Field name to sort by (endpoint specific)
+* `sortOrder` – "asc" or "desc"
+* `limit` – Number of records in the response
+* `offset` – Number of records to skip
+
+If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+greater than 2000 items will result in a 400 response.
+
+## Timestamps
+
+Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+These timestamps support nanosecond resolution with up to nine fractional digits.
+
+Examples:
+- 2023-04-06T09:15:30Z
+- 2023-04-06T18:27:45.876543210Z
+
+> Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+## Rate limits
+
+To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+request should be retried.
+
+In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+and you may issue retries with a strategy such as exponential backoff.
+
+## Endpoints
+
+### Data Platform
+
+**Coverage** - Coverage provides the ability to see which time spans are available within Foxglove.
+
+- `GET /data/coverage`: List coverage
+
+**Custom Properties** - Custom properties are typed metadata which you can assign to devices.
+
+- `GET /custom-properties`: List custom properties
+- `POST /custom-properties`: Create a custom property
+- `GET /custom-properties/{id}`: Get a custom property
+- `PATCH /custom-properties/{id}`: Edit a custom property
+- `DELETE /custom-properties/{id}`: Delete a custom property
+
+**Device Tokens** - Device tokens authenticate a device to the API.
+
+- `GET /device-tokens`: List device tokens
+- `POST /device-tokens`: Create a device token
+- `GET /device-tokens/{id}`: Get a device token
+- `PATCH /device-tokens/{id}`: Edit a device token
+- `DELETE /device-tokens/{id}`: Delete a device token
+
+**Devices** - Devices represent robots in your organization. It is common to have devices for both physical
+
+- `GET /devices`: List devices
+- `POST /devices`: Create a device
+- `POST /actions/devices/{nameOrId}/update-property-time-interval`: Update property time interval
+- `GET /devices/{nameOrId}`: Get a device
+- `DELETE /devices/{nameOrId}`: Delete a device
+- `PATCH /devices/{nameOrId}`: Update a device
+- `GET /devices/{nameOrId}/property-time-intervals`: List property time intervals
+- `GET /devices/{nameOrId}/property-time-intervals/{id}`: Get a device property time interval
+
+**Events** - Adding events can help you quickly identify, categorize, and search for points of interest in
+
+- `GET /events`: List events
+- `POST /events`: Create an event
+- `GET /events/{id}`: Get an event
+- `DELETE /events/{id}`: Delete an event
+- `PATCH /events/{id}`: Update an event
+
+**Event Types** - Event types help ensure data quality through validation, enable better filtering and analytics,
+
+- `GET /event-types`: List event types
+- `POST /event-types`: Create an event type
+- `GET /event-types/{id}`: Get an event type
+- `PATCH /event-types/{id}`: Update an event type
+- `DELETE /event-types/{id}`: Delete an event type
+
+**Imports** - **The Imports endpoints are deprecated. Use the [Recordings](#tag/Recordings) endpoints instead.**
+
+- `GET /data/imports`: List imports (deprecated)
+- `DELETE /data/imports`: Delete multiple imports (deprecated)
+- `DELETE /data/imports/{importId}`: Delete an import (deprecated)
+
+**Lake files** - MCAP files stored in the lake bucket of a [self-hosted Primary Site](https://docs.foxglove.dev/docs/primary-sites#self-hosted).
+
+- `GET /lake-files`: List lake files
+
+**Projects** - [Projects](https://docs.foxglove.dev/docs/projects) are a container for organizing data and resources in Foxglove.
+
+- `GET /projects`: List projects
+
+**Recording Attachments** - A recording attachment resource represents information about an MCAP attachment
+
+- `GET /recording-attachments`: List attachments
+- `GET /recording-attachments/{id}`: Get an attachment
+- `GET /recording-attachments/{id}/download`: Download an attachment
+
+**Recordings** - A recording is a resource representing the content of an MCAP file or ROS bag managed by Data
+
+- `GET /recordings`: List recordings
+- `GET /recordings/{keyOrId}`: Get a recording
+- `DELETE /recordings/{keyOrId}`: Delete a recording
+- `POST /recordings/{keyOrId}/import`: Import from edge
+- `GET /data/pending-imports`: List pending imports
+- `GET /data/import-errors`: List import errors
+- `POST /data/upload`: Upload a recording
+
+**Sessions** - Sessions are logical groupings of recordings from a single device. They allow you to manage
+
+- `GET /sessions`: List sessions
+- `POST /sessions`: Create a session
+- `GET /sessions/{keyOrId}`: Get a session
+- `PATCH /sessions/{keyOrId}`: Update recordings in a session
+- `DELETE /sessions/{keyOrId}`: Delete a session
+
+**Site Tokens** - Site tokens are credentials a [self-hosted Primary Site](https://docs.foxglove.dev/docs/primary-sites#self-hosted) or [Edge Site](https://docs.foxglove.dev/docs/edge-sites) use to communicate with the Foxglove API.
+
+- `GET /site-tokens`: List site tokens
+- `POST /site-tokens`: Create a site token
+- `DELETE /site-tokens/{id}`: Delete a site token
+
+**Site Inbox Notification Tokens** - Site inbox notification tokens are credentials used to authenticate bucket notifications for a [Primary Site](https://docs.foxglove.dev/docs/primary-sites) (self-managed or BYOS) to the Foxglove API.
+
+- `GET /site-inbox-notification-tokens`: List inbox notification tokens
+- `POST /site-inbox-notification-tokens`: Create a site inbox notification token
+- `DELETE /site-inbox-notification-tokens/{id}`: Delete an inbox notification token
+
+**Sites** - A site is a logical grouping of storage and compute for storing Recording data.
+
+- `GET /sites`: List sites
+- `POST /sites`: Create a Site
+- `GET /sites/{id}`: Get site details
+- `PATCH /sites/{id}`: Update site details
+- `DELETE /sites/{id}`: Delete a site
+- `POST /site-bucket-notifications`: Notify new recording
+
+**Stream data**
+
+- `POST /data/stream`: Download data
+
+**Topics** - Topics provide schema information for messages in the data source.
+
+- `GET /data/topics`: List topics
+
+### Webhooks
+
+### Visualization
+
+**Extensions**
+
+- `POST /extension-upload`: Publish an extension
+- `GET /extensions`: List extensions
+- `GET /extensions/{id}`: Get an extension
+- `DELETE /extensions/{id}`: Delete an extension
+
+**Layouts**
+
+- `GET /layouts`: List layouts
+- `POST /layouts`: Create a layout
+- `GET /layouts/{id}`: Get a layout
+- `DELETE /layouts/{id}`: Delete a layout
+- `PATCH /layouts/{id}`: Update a layout
+- `POST /layouts/{id}/restore`: Restore a layout
+
+## Related Resources
+
+- Full API reference: https://docs.foxglove.dev/api/llms-full.txt
+- Product documentation: https://docs.foxglove.dev/llms.txt
+- Full product documentation: https://docs.foxglove.dev/llms-full.txt
+- Python SDK: https://foxglove.github.io/foxglove-sdk/python
+- Rust SDK: https://docs.rs/foxglove
+- C++ SDK: https://foxglove.github.io/foxglove-sdk/cpp

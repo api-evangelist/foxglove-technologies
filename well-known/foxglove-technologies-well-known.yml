@@ -1,0 +1,71 @@
+generated: '2026-08-16'
+method: probed
+source: live GET probes on 2026-08-16 of every Foxglove host in apis.yml and the
+  OpenAPI servers[] block
+result: none
+note: >-
+  NO well-known documents are served. Foxglove publishes nothing at any RFC 8615
+  path on any of its hosts. Two hosts — app.foxglove.dev and embed.foxglove.dev —
+  are single-page applications whose catch-all route answers HTTP 200 with
+  `text/html` for EVERY path, including /.well-known/security.txt and
+  /.well-known/agent-card.json. Those 200s are the SPA shell, not documents, and
+  are recorded below as `spa-shell` misses. Because no path returned a real
+  document, NO WellKnown / SecurityTxt / AgentCard pointer is wired into apis.yml.
+hosts:
+- host: https://api.foxglove.dev
+  behavior: JSON 404 ({"error":"Not Found"}) on unknown paths
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+- host: https://foxglove.dev
+  behavior: HTML 404 page
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+- host: https://docs.foxglove.dev
+  behavior: Docusaurus HTML 404 page
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+- host: https://app.foxglove.dev
+  behavior: spa-shell — every path returns 200 text/html (the app shell)
+  documents:
+  - {path: /.well-known/security.txt, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/openid-configuration, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/oauth-authorization-server, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/oauth-protected-resource, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/api-catalog, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/ai-plugin.json, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/agent-card.json, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/agent.json, status: 200, verdict: spa-shell, content_type: text/html}
+- host: https://embed.foxglove.dev
+  behavior: spa-shell — every path returns 200 text/html (the embedded viewer shell)
+  documents:
+  - {path: /.well-known/security.txt, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/oauth-authorization-server, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/api-catalog, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/agent-card.json, status: 200, verdict: spa-shell, content_type: text/html}
+  - {path: /.well-known/agent.json, status: 200, verdict: spa-shell, content_type: text/html}
+recommendation: >-
+  A published /.well-known/security.txt (RFC 9116) pointing at Foxglove's security
+  page, and an /.well-known/api-catalog (RFC 9727) linking the OpenAPI at
+  docs.foxglove.dev/redocusaurus/plugin-redoc-0.yaml, would both be cheap wins.
+  The SPA catch-all on app./embed. should also 404 unknown /.well-known/* paths
+  rather than returning the app shell.

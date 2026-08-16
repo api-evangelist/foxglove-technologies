@@ -1,0 +1,58 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/docs/cli, https://github.com/foxglove/foxglove-cli
+name: foxglove
+binary: foxglove
+language: go
+repository: https://github.com/foxglove/foxglove-cli
+version: v1.0.33
+released: '2026-07-31'
+package: packages/foxglove-technologies-packages.yml
+install:
+- method: homebrew
+  command: brew install foxglove-cli
+  platforms: [macos]
+- method: go
+  command: go install github.com/foxglove/foxglove-cli/foxglove@latest
+- method: binary-download
+  url: https://github.com/foxglove/foxglove-cli/releases
+  platforms: [linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64,
+    windows/arm64]
+authentication:
+  command: foxglove auth login
+  note: Signs in against the Foxglove account at app.foxglove.dev; the CLI then calls
+    the same api.foxglove.dev/v1 surface documented in openapi/.
+commands:
+- group: auth
+  subcommands: [login]
+  purpose: Authenticate the CLI against a Foxglove account
+- group: projects
+  subcommands: [list]
+  backing_rest: [GET /projects]
+- group: devices
+  subcommands: [add, list, delete]
+  backing_rest: [POST /devices, GET /devices, 'DELETE /devices/{nameOrId}']
+- group: data
+  subcommands: [import]
+  purpose: Upload a recording to the Foxglove data platform
+  example: foxglove data import <path> --device-id <id>
+  backing_rest: [POST /data/upload]
+- group: recordings
+  subcommands: [list]
+  backing_rest: [GET /recordings]
+- group: events
+  subcommands: [add, list]
+  backing_rest: [POST /events, GET /events]
+- group: extensions
+  subcommands: [publish, list, unpublish]
+  backing_rest: [POST /extension-upload, GET /extensions, 'DELETE /extensions/{id}']
+- group: completion
+  subcommands: [bash, zsh, fish, powershell]
+  purpose: Shell autocompletion
+help: foxglove -h
+note: >-
+  The command surface above is what the CLI documentation publishes. `backing_rest`
+  entries are our mapping onto the OpenAPI, expressed as METHOD /path because the
+  specification declares no operationIds.
+related:
+- https://docs.foxglove.dev/docs/visualization/open-via-cli

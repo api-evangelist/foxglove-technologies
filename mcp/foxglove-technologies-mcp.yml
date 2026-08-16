@@ -1,0 +1,105 @@
+generated: '2026-08-16'
+method: searched
+status: published
+source: https://docs.foxglove.dev/docs/agents/mcp-server
+server:
+  name: foxglove
+  transport: http
+  scope: loopback-only
+  local_endpoint: http://127.0.0.1:7333/mcp
+  description: >-
+    Foxglove Desktop can run a Model Context Protocol server so external agents
+    (Claude Code, Cursor, Claude Desktop and other MCP clients) can see and control
+    the running app. It is desktop-only — the web app does not host it — and it
+    binds to loopback on port 7333. It is NOT a hosted, internet-reachable MCP
+    endpoint: an agent can only reach it on the same machine, after a human installs
+    the desktop app, signs in, and turns on the "Local MCP server" toggle under
+    Settings > Personal > Agents & MCP.
+deployment:
+  mode: local-stdio
+  endpoint: null
+  install: >-
+    Install the Foxglove desktop app (https://foxglove.dev/download), sign in, then
+    Settings > Personal > Agents & MCP > enable "Local MCP server". Register it with
+    a client, e.g.
+    `claude mcp add --transport http foxglove http://127.0.0.1:7333/mcp --header "Authorization: Bearer <token>"`
+  package: https://foxglove.dev/download
+  auth: api-key
+  verified: searched
+  note: >-
+    Recorded as local-stdio rather than remote because it is not an agent-reachable
+    surface on the public internet. The transport is streamable HTTP rather than
+    stdio, but the deployment shape is the local one: a human must install and run
+    software on a machine before any agent sees it. `endpoint` is deliberately null
+    — http://127.0.0.1:7333/mcp is a loopback address, not a URL an MCP client can
+    POST to across a network.
+requirements:
+- Foxglove desktop app (not available in the web app)
+- Pro, Enterprise or Academic plan
+- A developer seat — the Local MCP server toggle stays disabled on a basic seat
+- Signed-in session; cloud-backed tools are forwarded through the signed-in user's
+  own permissions, and appear in audit logs as that user
+authentication:
+  scheme: http-bearer
+  header: Authorization
+  token: >-
+    The desktop app generates a random access token the first time the MCP server
+    starts; every client presents it as a bearer token. Regeneratable from
+    Settings > Personal > Agents & MCP.
+tools:
+  introspection: gated
+  introspection_note: >-
+    tools/list could not be called: the server exists only on a licensed user's own
+    machine behind a locally-generated bearer token, so there is no anonymous
+    endpoint to introspect and no published tools/list manifest. The catalog below
+    is the capability table Foxglove publishes at
+    https://docs.foxglove.dev/docs/agents#what-agents-can-do — real, provider-stated
+    capabilities grouped by area. Exact tool names and inputSchemas require
+    authenticated introspection of a running desktop app.
+  annotations: >-
+    Foxglove marks every tool with the standard MCP annotations — read-only tools
+    are flagged read-only, and anything that modifies a layout, a user script or an
+    event is flagged destructive. Foxglove adds no approval step of its own; the MCP
+    client is the control point.
+  catalog:
+  - area: Data source
+    capabilities: List topics, read schemas and messages, summarize the loaded data
+      source
+    kind: read
+  - area: Playback
+    capabilities: Read playback state, pause, seek, set the playback range
+    kind: write
+  - area: Layouts
+    capabilities: Read, create, modify, rename and validate layouts; configure
+      individual panels; capture the app, layout or a panel as an image
+    kind: write
+  - area: User scripts
+    capabilities: List, read, create, update and delete user scripts
+    kind: write
+  - area: Events
+    capabilities: Read, create, update and delete events that annotate moments in
+      the data
+    kind: write
+  - area: Data search
+    capabilities: Search the organization's recordings, sessions and events
+    kind: read
+  - area: Devices
+    capabilities: List devices and look one up by name or ID (read-only)
+    kind: read
+  - area: Projects and Sites
+    capabilities: List the organization's Projects, Primary Sites and Edge Sites
+    kind: read
+  - area: Navigation
+    capabilities: Take the app to a specific page or view
+    kind: write
+  - area: Documentation
+    capabilities: Search the Foxglove docs and cite sources
+    kind: read
+  - area: Skills
+    capabilities: Foxglove's built-in task playbooks — layouts, panel configuration,
+      FoxQL, search syntax, user scripts and MCAP diagnostics
+    kind: read
+related:
+- https://docs.foxglove.dev/docs/agents
+- https://docs.foxglove.dev/docs/agents/agent-sidebar
+- https://docs.foxglove.dev/docs/agents/slack

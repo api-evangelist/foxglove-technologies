@@ -1,23 +1,150 @@
 aid: foxglove-technologies
 name: Foxglove Technologies
-description: 'Foxglove Technologies is a company surfaced via the API Evangelist harvest backlog (source:
-  secondary-market) and added to the network as a stub for full-pipeline profiling.'
+description: 'Foxglove Technologies, Inc. (foxglove.dev) builds a multimodal data platform
+  for robotics, autonomy and physical AI. Its products cover visualization and debugging
+  of robot data (3D scenes, images, plots, logs, maps), cloud and self-hosted data
+  infrastructure for recording ingest and retention, fleet and device management, and
+  an agent layer that lets AI assistants inspect recordings. Foxglove publishes an
+  OpenAPI 3.1 REST API at api.foxglove.dev/v1 for devices, recordings, sessions, events,
+  event types, custom properties, sites, tokens, extensions and layouts; a webhook
+  event surface; SDKs for Python, Rust, C++, C, Go and TypeScript; a Go CLI; and the
+  open-source MCAP container format and Foxglove message schemas.'
 url: https://raw.githubusercontent.com/api-evangelist/foxglove-technologies/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
+image: https://foxglove.dev/images/logo-icon-round.png
 created: '2026-08-16'
 modified: '2026-08-16'
 tags:
-- Company
-apis: []
+- Robotics
+- Observability
+- Visualization
+- Data Platform
+- Physical AI
+- Autonomy
+- Fleet Management
+- Developer Tools
+- MCAP
+- ROS
+apis:
+- aid: foxglove-technologies-api
+  name: Foxglove API
+  description: The Foxglove REST API provides programmatic access to the Foxglove
+    data platform — devices, device tokens, recordings, sessions, events, event types,
+    custom properties, coverage, topics, data streaming and upload, sites and site
+    tokens, lake files, projects, extensions and layouts. Authenticated with an
+    organization API key presented as an HTTP bearer token, with per-endpoint
+    capability requirements.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Robotics
+  - Data Platform
+  - Recordings
+  - Devices
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-openapi-original.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: Overlay
+    url: overlays/foxglove-technologies-api-overlay.yaml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Packages
+  url: packages/foxglove-technologies-packages.yml
+- type: SDKs
+  url: packages/foxglove-technologies-packages.yml
+- type: CLI
+  url: cli/foxglove-technologies-cli.yml
+- type: Components
+  url: components/foxglove-technologies-components.yml
+- type: MCPServer
+  url: mcp/foxglove-technologies-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/foxglove-technologies-llms.txt
+- type: Webhooks
+  url: asyncapi/foxglove-technologies-webhooks.yml
+- type: Conventions
+  url: conventions/foxglove-technologies-conventions.yml
+- type: Lifecycle
+  url: lifecycle/foxglove-technologies-lifecycle.yml
+- type: Conformance
+  url: conformance/foxglove-technologies-conformance.yml
+- type: Compliance
+  url: https://foxglove.dev/security
+- type: Sandbox
+  url: sandbox/foxglove-technologies-sandbox.yml
+- type: Plans
+  url: plans/foxglove-technologies-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/foxglove-technologies-rate-limits.yml
+- type: JSONSchema
+  url: json-schema/_index.yml
+- type: Protobuf
+  url: grpc/_index.yml
+- type: Download
+  url: https://foxglove.dev/download
+- type: AgenticAccess
+  url: agentic-access/foxglove-technologies-agentic-access.yml
+- type: TrustCenter
+  url: security/foxglove-technologies-trust-center.yml
+- type: DomainSecurity
+  url: security/foxglove-technologies-domain-security.yml
 - type: Website
-  url: https://www.nasdaqprivatemarket.com/
+  url: https://foxglove.dev
+- type: DeveloperPortal
+  url: https://docs.foxglove.dev/docs
+- type: Documentation
+  url: https://docs.foxglove.dev/docs
+- type: APIReference
+  url: https://docs.foxglove.dev/api
+- type: GettingStarted
+  url: https://docs.foxglove.dev/docs/getting-started-guide
+- type: Support
+  url: https://foxglove.dev/contact
+- type: Community
+  url: https://foxglove.dev/community
+- type: Blog
+  url: https://foxglove.dev/blog
+- type: BlogRSS
+  url: https://foxglove.dev/rss.xml
+- type: GitHubOrganization
+  url: https://github.com/foxglove
+- type: Pricing
+  url: https://foxglove.dev/pricing
+- type: SignUp
+  url: https://app.foxglove.dev/
+- type: TermsOfService
+  url: https://foxglove.dev/legal/terms
+- type: PrivacyPolicy
+  url: https://foxglove.dev/legal/privacy
+- type: StatusPage
+  url: https://status.foxglove.dev/
+- type: ChangeLog
+  url: https://docs.foxglove.dev/changelog
+- type: ChangeLog
+  url: changelog/foxglove-technologies-changelog.yml
+x-enrichment:
+  date: '2026-08-16'
+  status: enriched
+  artifacts_added: 128
+  pass: local-v1

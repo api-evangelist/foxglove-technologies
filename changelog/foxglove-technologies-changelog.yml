@@ -1,0 +1,90 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/changelog
+feeds:
+- format: rss
+  url: https://docs.foxglove.dev/changelog/rss.xml
+- format: atom
+  url: https://docs.foxglove.dev/changelog/atom.xml
+scheme: semver, per-component
+components:
+- name: Foxglove (app)
+  current: 2.59.0
+  cadence: roughly every two weeks
+- name: Primary Site
+  current: 0.0.106
+- name: Foxlet
+  current: 1.5.0
+- name: Remote Data Loader
+  current: 0.0.11
+note: >-
+  The changelog is dated, per-release and syndicated over RSS/Atom, but it tracks the
+  PRODUCT components (app, Primary Site, Foxlet, Remote Data Loader). There is no
+  separate REST API changelog: changes to api.foxglove.dev/v1 surface only when they
+  ride along in an app release note. Only the recent window is captured here; the
+  live changelog is the source of truth.
+entries:
+- version: Remote Data Loader v0.0.11
+  date: '2026-08-13'
+  url: https://docs.foxglove.dev/changelog/remote-data-loader/v0.0.11
+  breaking: false
+- version: Foxglove 2.59.0
+  date: '2026-08-04'
+  url: https://docs.foxglove.dev/changelog/foxglove/v2.59.0
+  breaking: false
+  highlights:
+  - Desktop MCP server — the desktop app can run a local Model Context Protocol
+    server so external coding assistants can see and control Foxglove; requires Pro
+    or Enterprise and a developer seat.
+  - Search with FoxQL and Gallery previews — query devices, metadata, topics and
+    message fields, then review matches as preview cards.
+  - Foxlet auto-delete of local files after import.
+  - Recordings list renders before pending imports resolve.
+- version: Foxlet v1.5.0
+  date: '2026-07-30'
+  url: https://docs.foxglove.dev/changelog/foxlet/v1.5.0
+  breaking: false
+- version: Primary Site v0.0.106
+  date: '2026-07-30'
+  url: https://docs.foxglove.dev/changelog/primary-site/v0.0.106
+  breaking: false
+- version: Foxglove 2.58.0
+  date: '2026-07-29'
+  url: https://docs.foxglove.dev/changelog/foxglove/v2.58.0
+  breaking: false
+- version: Remote Data Loader v0.0.9
+  date: '2026-07-28'
+  url: https://docs.foxglove.dev/changelog/remote-data-loader/v0.0.9
+  breaking: false
+- version: Remote Data Loader v0.0.8
+  date: '2026-07-22'
+  url: https://docs.foxglove.dev/changelog/remote-data-loader/v0.0.8
+  breaking: false
+- version: Foxglove 2.57.0
+  date: '2026-07-14'
+  url: https://docs.foxglove.dev/changelog/foxglove/v2.57.0
+  breaking: false
+- version: Foxglove 2.56.0
+  date: '2026-06-30'
+  url: https://docs.foxglove.dev/changelog/foxglove/v2.56.0
+  breaking: false
+- version: Primary Site v0.0.105
+  date: '2026-06-30'
+  url: https://docs.foxglove.dev/changelog/primary-site/v0.0.105
+  breaking: false
+- version: Primary Site v0.0.104
+  date: '2026-06-25'
+  url: https://docs.foxglove.dev/changelog/primary-site/v0.0.104
+  breaking: false
+- version: Foxglove 2.55.0
+  date: '2026-06-16'
+  url: https://docs.foxglove.dev/changelog/foxglove/v2.55.0
+  breaking: false
+- version: Remote Data Loader v0.0.7
+  date: '2026-06-16'
+  url: https://docs.foxglove.dev/changelog/remote-data-loader/v0.0.7
+  breaking: false
+- version: Primary Site v0.0.103
+  date: '2026-06-12'
+  url: https://docs.foxglove.dev/changelog/primary-site/v0.0.103
+  breaking: false

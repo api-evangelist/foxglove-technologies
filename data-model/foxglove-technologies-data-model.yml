@@ -1,0 +1,123 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/foxglove-technologies-openapi-original.yml (components.schemas $ref
+  edges and id-reference fields)
+note: >-
+  Derived mechanically from the 43 component schemas and their $ref/id-field links.
+  Foxglove publishes no object-reference page with id prefixes, so no prefix column
+  is asserted. Cardinality is read from the field shape (array vs object) and from
+  the collection endpoints that filter by the id.
+entities:
+- name: Project
+  description: Container for organizing data and resources; the top of the ownership
+    tree
+  fields: [id, name, orgMemberCount, lastSeenAt, isInviteOnly]
+  endpoints: [GET /projects]
+  docs: https://docs.foxglove.dev/docs/projects
+- name: Device
+  description: A robot in the organization; may be physical or simulated
+  fields: [id, name, projectId, retainRecordingsSeconds, properties, enabled,
+    remoteAccessEnabled, autoDeleteAfterImport]
+  endpoints: [GET /devices, POST /devices, 'GET /devices/{nameOrId}', 'PATCH /devices/{nameOrId}', 'DELETE /devices/{nameOrId}']
+  docs: https://docs.foxglove.dev/docs/data/devices
+- name: DeviceToken
+  description: Credential authenticating a device to the API
+  fields: [id, createdAt, deviceId, projectId, enabled, preapproved]
+  endpoints: [GET /device-tokens, POST /device-tokens, 'GET /device-tokens/{id}', 'PATCH /device-tokens/{id}', 'DELETE /device-tokens/{id}']
+- name: Recording
+  description: The content of an MCAP file or ROS bag managed by the data platform
+  fields: [id, projectId, path, size, createdAt, importedAt, start, end,
+    importStatus, site, edgeSite, device, key, metadata, sessionId]
+  endpoints: [GET /recordings, 'GET /recordings/{keyOrId}', 'DELETE /recordings/{keyOrId}', 'POST /recordings/{keyOrId}/import', POST /data/upload]
+  docs: https://docs.foxglove.dev/docs/data/recordings
+- name: RecordingSession
+  description: A logical grouping of recordings from a single device
+  fields: [id, projectId, device, key, createdAt, updatedAt, properties, recordings]
+  endpoints: [GET /sessions, POST /sessions, 'GET /sessions/{keyOrId}', 'PATCH /sessions/{keyOrId}', 'DELETE /sessions/{keyOrId}']
+  docs: https://docs.foxglove.dev/docs/data/sessions
+- name: RecordingAttachment
+  description: An MCAP attachment carried inside a recording
+  fields: [id, recordingId, siteId, name, mediaType, logTime, createTime, crc,
+    dataOffset, size, fingerprint, lakePath]
+  endpoints: [GET /recording-attachments, 'GET /recording-attachments/{id}', 'GET /recording-attachments/{id}/download']
+- name: Event
+  description: A timestamped annotation marking a point or span of interest
+  fields: [id, start, end, deviceId, device, metadata, createdAt, updatedAt,
+    eventTypeId, properties]
+  endpoints: [GET /events, POST /events, 'GET /events/{id}', 'PATCH /events/{id}', 'DELETE /events/{id}']
+  docs: https://docs.foxglove.dev/docs/data/events
+- name: EventType
+  description: Validation vocabulary an event binds to
+  fields: [id, name, createdAt, updatedAt, colorName, customProperties]
+  endpoints: [GET /event-types, POST /event-types, 'GET /event-types/{id}', 'PATCH /event-types/{id}', 'DELETE /event-types/{id}']
+- name: CustomProperty
+  description: Typed metadata definition assignable to devices, events and sessions
+  endpoints: [GET /custom-properties, POST /custom-properties, 'GET /custom-properties/{id}', 'PATCH /custom-properties/{id}', 'DELETE /custom-properties/{id}']
+- name: DeviceCustomPropertyTimeInterval
+  description: A time interval over which a custom property value applied to a device
+  endpoints: ['GET /devices/{nameOrId}/property-time-intervals', 'GET /devices/{nameOrId}/property-time-intervals/{id}', 'POST /actions/devices/{nameOrId}/update-property-time-interval']
+- name: Site
+  description: A logical grouping of storage and compute holding recording data;
+    Primary or Edge
+  fields: [id, name, type, url, retainRecordingsSeconds]
+  endpoints: [GET /sites, POST /sites, 'GET /sites/{id}', 'PATCH /sites/{id}', 'DELETE /sites/{id}']
+  docs: https://docs.foxglove.dev/docs/data/primary-sites
+- name: SiteToken
+  description: Credential a self-hosted Primary or Edge Site uses to reach the API
+  fields: [id, createdAt, siteId]
+  endpoints: [GET /site-tokens, POST /site-tokens, 'DELETE /site-tokens/{id}']
+- name: InboxNotificationToken
+  description: Credential authenticating bucket notifications from a site to the API
+  endpoints: [GET /site-inbox-notification-tokens, POST /site-inbox-notification-tokens, 'DELETE /site-inbox-notification-tokens/{id}', POST /site-bucket-notifications]
+- name: Topic
+  description: Schema information for messages in a data source
+  fields: [encoding, schema, schemaEncoding, schemaName, topic, version]
+  endpoints: [GET /data/topics]
+- name: Coverage
+  description: The time spans of data available for a device
+  fields: [deviceId, device, start, end, status, importStatus]
+  endpoints: [GET /data/coverage]
+- name: Layout
+  description: A saved arrangement of visualization panels
+  fields: [id, name, createdAt, updatedAt, savedAt, folderName, permission, data]
+  endpoints: [GET /layouts, POST /layouts, 'GET /layouts/{id}', 'PATCH /layouts/{id}', 'POST /layouts/{id}/restore', 'DELETE /layouts/{id}']
+- name: Extension
+  description: A published custom panel or converter
+  fields: [id, name, publisher, displayName, description, activeVersion, sha256Sum]
+  endpoints: [POST /extension-upload, GET /extensions, 'GET /extensions/{id}', 'DELETE /extensions/{id}']
+- name: Import
+  description: Deprecated predecessor of Recording
+  deprecated: true
+  endpoints: [GET /data/imports, DELETE /data/imports, 'DELETE /data/imports/{importId}']
+relationships:
+- {from: Device, to: Project, kind: belongs_to, via: projectId}
+- {from: Device, to: CustomPropertyValues, kind: has_one, via: properties}
+- {from: Device, to: DeviceToken, kind: has_many, via: deviceId}
+- {from: Device, to: DeviceCustomPropertyTimeInterval, kind: has_many, via: nameOrId
+    path segment}
+- {from: DeviceToken, to: Project, kind: belongs_to, via: projectId}
+- {from: Recording, to: Project, kind: belongs_to, via: projectId}
+- {from: Recording, to: Device, kind: belongs_to, via: device (DeviceSummary)}
+- {from: Recording, to: RecordingSession, kind: belongs_to, via: sessionId}
+- {from: Recording, to: Site, kind: belongs_to, via: site (PrimarySiteSummary)}
+- {from: Recording, to: Site, kind: belongs_to, via: edgeSite (EdgeSiteSummary)}
+- {from: Recording, to: RecordingImportStatus, kind: has_one, via: importStatus}
+- {from: Recording, to: RecordingMetadata, kind: has_one, via: metadata}
+- {from: RecordingSession, to: Project, kind: belongs_to, via: projectId}
+- {from: RecordingSession, to: Device, kind: belongs_to, via: device (DeviceSummary)}
+- {from: RecordingSession, to: Recording, kind: has_many, via: recordings}
+- {from: RecordingSession, to: CustomPropertyValues, kind: has_one, via: properties}
+- {from: RecordingAttachment, to: Recording, kind: belongs_to, via: recordingId}
+- {from: RecordingAttachment, to: Site, kind: belongs_to, via: siteId}
+- {from: Event, to: Device, kind: belongs_to, via: deviceId}
+- {from: Event, to: EventType, kind: belongs_to, via: eventTypeId}
+- {from: Event, to: CustomPropertyValues, kind: has_one, via: properties}
+- {from: EventType, to: EventTypeCustomProperty, kind: has_many, via: customProperties}
+- {from: SiteToken, to: Site, kind: belongs_to, via: siteId}
+- {from: Coverage, to: Device, kind: belongs_to, via: deviceId}
+- {from: Coverage, to: RecordingImportStatus, kind: has_one, via: importStatus}
+- {from: Layout, to: LayoutPermission, kind: has_one, via: permission}
+webhook_projection:
+  note: Six of the eight webhook payloads project these same entities — see
+    asyncapi/foxglove-technologies-webhooks.yml
+  entities: [Recording, RecordingSession, Device, Event]

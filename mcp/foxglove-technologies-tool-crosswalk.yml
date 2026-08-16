@@ -1,0 +1,155 @@
+generated: '2026-08-16'
+method: derived
+source: mcp/foxglove-technologies-mcp.yml + openapi/foxglove-technologies-openapi-original.yml
+note: >-
+  Foxglove's OpenAPI declares NO operationId on any of its 73 operations, so every
+  `rest:` binding below is expressed as `METHOD /path` — the only stable identifier
+  the spec actually publishes. The MCP tool list itself is gated (see
+  mcp/foxglove-technologies-mcp.yml): the server runs only on a licensed user's own
+  machine, so tools were mapped from the provider's published capability table by
+  name and semantics, and `confidence` is set accordingly. Nothing here was invented:
+  every REST row exists verbatim in the spec, and every tool row exists verbatim in
+  Foxglove's agent capability table.
+surfaces:
+  openapi:
+    file: openapi/foxglove-technologies-openapi-original.yml
+    server: https://api.foxglove.dev/v1
+    operations: 73
+    operation_ids: false
+  mcp:
+    endpoint: http://127.0.0.1:7333/mcp
+    gated: true
+    gate: desktop app + paid plan + locally generated bearer token
+  graphql: null
+crosswalk:
+- tool: Data search — search recordings
+  category: data search
+  rest: [GET /recordings, 'GET /recordings/{keyOrId}']
+  binding: rest
+  confidence: high
+- tool: Data search — search sessions
+  category: data search
+  rest: [GET /sessions, 'GET /sessions/{keyOrId}']
+  binding: rest
+  confidence: high
+- tool: Data search — search events
+  category: data search
+  rest: [GET /events, 'GET /events/{id}']
+  binding: rest
+  confidence: high
+- tool: Devices — list devices
+  category: devices
+  rest: [GET /devices]
+  binding: rest
+  confidence: high
+- tool: Devices — look up a device by name or ID
+  category: devices
+  rest: ['GET /devices/{nameOrId}']
+  binding: rest
+  confidence: high
+- tool: Projects and Sites — list Projects
+  category: projects
+  rest: [GET /projects]
+  binding: rest
+  confidence: high
+- tool: Projects and Sites — list Primary Sites and Edge Sites
+  category: sites
+  rest: [GET /sites, 'GET /sites/{id}']
+  binding: rest
+  confidence: high
+  note: The REST Sites collection carries both Primary and Edge sites, distinguished
+    by the `type` field on the Site schema.
+- tool: Events — create an event
+  category: events
+  rest: [POST /events]
+  binding: rest
+  confidence: high
+- tool: Events — update an event
+  category: events
+  rest: ['PATCH /events/{id}']
+  binding: rest
+  confidence: high
+- tool: Events — delete an event
+  category: events
+  rest: ['DELETE /events/{id}']
+  binding: rest
+  confidence: high
+- tool: Events — read event types
+  category: events
+  rest: [GET /event-types, 'GET /event-types/{id}']
+  binding: rest
+  confidence: medium
+  note: The capability table says agents read and write events; event types are the
+    validation vocabulary those events bind to, so the mapping is semantic rather
+    than stated.
+- tool: Data source — list topics
+  category: data source
+  rest: [GET /data/topics]
+  binding: rest
+  confidence: high
+- tool: Data source — read messages from the loaded source
+  category: data source
+  rest: [POST /data/stream]
+  binding: rest
+  confidence: medium
+  note: The MCP tool reads from whatever source is open in the active app tab, which
+    for a cloud recording is served by the same streaming path; for a local file it
+    has no REST backing at all.
+- tool: Layouts — read, create, modify, rename layouts
+  category: layouts
+  rest: [GET /layouts, POST /layouts, 'GET /layouts/{id}', 'PATCH /layouts/{id}', 'POST /layouts/{id}/restore']
+  binding: rest
+  confidence: medium
+  note: Cloud-saved layouts are the REST Layouts resource; a layout that only exists
+    in the running app is edited in-process and never touches the API.
+mcp_only:
+- tool: Playback — read state, pause, seek, set the playback range
+  reason: Controls the running desktop application; there is no REST playback
+    resource.
+- tool: Layouts — configure individual panels, capture the app/layout/panel as an
+    image
+  reason: Operates on live app state and renders from the running client; not exposed
+    over REST.
+- tool: User scripts — list, read, create, update, delete
+  reason: User scripts live in the visualization layer; the REST API has no user
+    script resource.
+- tool: Navigation — take the app to a specific page or view
+  reason: Pure client control.
+- tool: Documentation — search the Foxglove docs and cite sources
+  reason: Answered from Foxglove's documentation index, not from api.foxglove.dev.
+- tool: Skills — built-in task playbooks (layouts, panel config, FoxQL, search
+    syntax, user scripts, MCAP diagnostics)
+  reason: Server-side prompt/playbook assets with no REST equivalent.
+rest_only:
+- capability: Recording lifecycle
+  rest: ['DELETE /recordings/{keyOrId}', 'POST /recordings/{keyOrId}/import', POST /data/upload, GET /data/pending-imports, GET /data/import-errors]
+- capability: Deprecated import endpoints
+  rest: [GET /data/imports, DELETE /data/imports, 'DELETE /data/imports/{importId}']
+- capability: Session write operations
+  rest: [POST /sessions, 'PATCH /sessions/{keyOrId}', 'DELETE /sessions/{keyOrId}']
+- capability: Device write operations
+  rest: [POST /devices, 'PATCH /devices/{nameOrId}', 'DELETE /devices/{nameOrId}', 'POST /actions/devices/{nameOrId}/update-property-time-interval', 'GET /devices/{nameOrId}/property-time-intervals', 'GET /devices/{nameOrId}/property-time-intervals/{id}']
+- capability: Device tokens
+  rest: [GET /device-tokens, POST /device-tokens, 'GET /device-tokens/{id}', 'PATCH /device-tokens/{id}', 'DELETE /device-tokens/{id}']
+- capability: Site tokens and inbox notification tokens
+  rest: [GET /site-tokens, POST /site-tokens, 'DELETE /site-tokens/{id}', GET /site-inbox-notification-tokens, POST /site-inbox-notification-tokens, 'DELETE /site-inbox-notification-tokens/{id}', POST /site-bucket-notifications]
+- capability: Site administration
+  rest: [POST /sites, 'PATCH /sites/{id}', 'DELETE /sites/{id}']
+- capability: Custom properties
+  rest: [GET /custom-properties, POST /custom-properties, 'GET /custom-properties/{id}', 'PATCH /custom-properties/{id}', 'DELETE /custom-properties/{id}']
+- capability: Event type administration
+  rest: [POST /event-types, 'PATCH /event-types/{id}', 'DELETE /event-types/{id}']
+- capability: Extensions
+  rest: [POST /extension-upload, GET /extensions, 'GET /extensions/{id}', 'DELETE /extensions/{id}']
+- capability: Recording attachments
+  rest: [GET /recording-attachments, 'GET /recording-attachments/{id}', 'GET /recording-attachments/{id}/download']
+- capability: Coverage and lake files
+  rest: [GET /data/coverage, GET /lake-files]
+- capability: Layout deletion
+  rest: ['DELETE /layouts/{id}']
+coverage:
+  tools_named: 15
+  tools_bound_to_rest: 15
+  mcp_only: 6
+  rest_operations_total: 73
+  rest_operations_with_a_tool: 26

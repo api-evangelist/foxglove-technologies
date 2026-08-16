@@ -1,0 +1,52 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Foxglove API
+  version: 1.0.0
+extends: openapi/foxglove-technologies-openapi-original.yml
+x-generated: '2026-08-16'
+x-method: generated
+x-source: >-
+  Derived from openapi/foxglove-technologies-openapi-original.yml (harvested verbatim
+  from https://docs.foxglove.dev/redocusaurus/plugin-redoc-0.yaml) plus the runtime
+  semantics captured in conventions/, rate-limits/, errors/ and lifecycle/. The
+  harvested spec is never mutated; these are our additive annotations.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-profile: https://apis.io/provider/foxglove-technologies
+    x-apievangelist-harvested-from: https://docs.foxglove.dev/redocusaurus/plugin-redoc-0.yaml
+    x-api-evangelist-conventions: conventions/foxglove-technologies-conventions.yml
+    x-api-evangelist-errors: errors/foxglove-technologies-problem-types.yml
+    x-api-evangelist-rate-limits: rate-limits/foxglove-technologies-rate-limits.yml
+    x-api-evangelist-lifecycle: lifecycle/foxglove-technologies-lifecycle.yml
+    x-api-evangelist-webhooks: asyncapi/foxglove-technologies-webhooks.yml
+- target: $.info
+  update:
+    x-operation-ids-missing: >-
+      No operation in this specification declares an operationId. Tooling that
+      generates clients, workflows or agent tools from this document must synthesize
+      identifiers from method+path, and every downstream API Evangelist artifact
+      binds to `METHOD /path` for that reason.
+- target: $.servers
+  update:
+    x-api-evangelist-note: >-
+      api.foxglove.dev is the production host despite the .dev TLD; the spec's own
+      server description reads "Production".
+- target: $.components.securitySchemes.ApiKey
+  update:
+    x-key-prefix: fox_sk_
+    x-capability-model: >-
+      Each operation's security requirement names the API key capability it needs
+      (e.g. devices.list). 48 distinct capabilities are declared across the spec;
+      see authentication/foxglove-technologies-authentication.yml.
+    x-admin-only: Only organization admins can create an API key.
+- target: $.components.schemas.Error
+  update:
+    x-error-envelope: >-
+      Foxglove returns a flat {"error": "<message>"} envelope, not RFC 9457
+      application/problem+json.
+- target: $.tags
+  update:
+    x-api-evangelist-note: >-
+      The Imports tag is deprecated in favour of Recordings; all three of its
+      operations carry deprecated:true in the source spec.

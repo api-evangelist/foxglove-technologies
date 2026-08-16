@@ -1,0 +1,111 @@
+generated: '2026-08-16'
+method: searched
+source: https://docs.foxglove.dev/api (API reference introduction),
+  https://docs.foxglove.dev/api/llms.txt, https://docs.foxglove.dev/docs/webhooks/security
+derived_from: openapi/foxglove-technologies-openapi-original.yml
+api: Foxglove API v1 — https://api.foxglove.dev/v1
+authentication:
+  style: http-bearer
+  header: Authorization
+  format: 'Bearer fox_sk_...'
+  key_prefix: fox_sk_
+  issuance: Organization admins only
+  model: per-endpoint capability requirements attached to the API key
+  alternatives:
+  - Session cookie `fox.session` for browser sessions on the Foxglove web app
+  - Site bucket notification bearer token for POST /site-bucket-notifications, the
+    one route that does not require an API key
+  see: authentication/foxglove-technologies-authentication.yml
+idempotency:
+  supported: false
+  request_header: null
+  note: >-
+    Foxglove publishes NO request idempotency contract — there is no Idempotency-Key
+    header, no idempotency parameter anywhere in the 73-operation specification, and
+    no idempotency section in the API reference. A retried POST /events or
+    POST /devices is a new write. The only idempotency guidance Foxglove publishes
+    runs the other direction, on the webhook CONSUMER side: deliveries are
+    at-least-once and the consumer is told to deduplicate on `webhookId` +
+    `webhookEventId`. That is consumer-side dedupe, not an API idempotency contract,
+    so no Idempotency pointer is wired into apis.yml.
+  consumer_side_dedupe:
+    surface: webhooks
+    keys: [webhookId, webhookEventId]
+    replay_guard: reject deliveries whose `deliveryAttemptedAt` is older than 1 minute
+    source: https://docs.foxglove.dev/docs/webhooks/security
+pagination:
+  style: offset
+  supported_on: some GET collection endpoints (the endpoint documentation names the
+    parameters where supported)
+  parameters:
+  - name: limit
+    description: Number of records in the response
+    default: 2000
+    maximum: 2000
+    on_exceed: HTTP 400
+  - name: offset
+    description: Number of records to skip
+  sorting:
+  - name: sortBy
+    description: Field name to sort by (endpoint specific)
+  - name: sortOrder
+    description: asc or desc
+  response_fields: none — collections are returned as bare JSON arrays with no
+    envelope, total count or next-page cursor
+  note: >-
+    Because there is no total and no cursor, a client cannot tell a full last page
+    from a truncated one except by requesting limit+1.
+field_expansion:
+  supported: false
+sparse_fieldsets:
+  supported: false
+metadata:
+  supported: true
+  mechanisms:
+  - name: custom properties
+    description: Typed metadata definitions (CustomProperty) assigned to devices,
+      events and sessions via the `properties` object
+    endpoints: [GET /custom-properties, POST /custom-properties, 'PATCH /custom-properties/{id}']
+  - name: recording metadata
+    description: RecordingMetadata carried on Recording resources
+  - name: event metadata
+    description: Free-form key/value metadata on Event via EventMetadataInput
+request_tracing:
+  request_id_header: none published
+  note: Foxglove documents no request-id/correlation header on API responses.
+versioning:
+  scheme: uri-path
+  current: v1
+  base: https://api.foxglove.dev/v1
+  spec_version: v1 (info.version)
+  see: lifecycle/foxglove-technologies-lifecycle.yml
+timestamps:
+  format: RFC 3339 / ISO 8601 UTC "Zulu"
+  precision: nanosecond — up to nine fractional digits
+  examples:
+  - '2023-04-06T09:15:30Z'
+  - '2023-04-06T18:27:45.876543210Z'
+  unsupported: RFC 3339 variants using durations or non-ISO8601 offsets
+error_envelope:
+  media_type: application/json
+  shape: '{"error": "<message>"}'
+  rfc9457: false
+  see: errors/foxglove-technologies-problem-types.yml
+rate_limit_signaling:
+  status: 429
+  headers: [Retry-After]
+  published_numbers: false
+  guidance: exponential backoff
+  see: rate-limits/foxglove-technologies-rate-limits.yml
+webhooks:
+  signature_header: fg-webhook-signature
+  algorithm: HMAC-SHA256 over the raw request body, keyed with the webhook token
+  delivery: at-least-once, up to 5 retries with increasing delay
+  consumer_timeout: 5 seconds, must return 2xx
+  see: asyncapi/foxglove-technologies-webhooks.yml
+operation_identifiers:
+  operation_ids_present: false
+  note: >-
+    Not one of the 73 operations declares an operationId, so generated SDKs, Arazzo
+    workflows and MCP tool bindings must synthesize names from method+path. This is
+    the single most impactful contract-quality gap in the specification.

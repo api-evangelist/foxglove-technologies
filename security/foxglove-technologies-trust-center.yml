@@ -1,0 +1,13 @@
+generated: '2026-08-16'
+method: searched
+probe: true
+source: https://foxglove.dev/security
+url: https://foxglove.dev/security
+certifications:
+- SOC 2
+- GDPR
+evidence:
+- source: https://foxglove.dev/security
+  keywords:
+  - soc 2
+  - gdpr
