@@ -12,7 +12,7 @@ description: 'Foxglove Technologies, Inc. (foxglove.dev) builds a multimodal dat
 url: https://raw.githubusercontent.com/api-evangelist/foxglove-technologies/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-specificationVersion: '0.20'
+specificationVersion: '0.23'
 image: https://foxglove.dev/images/logo-icon-round.png
 created: '2026-08-16'
 modified: '2026-08-16'
