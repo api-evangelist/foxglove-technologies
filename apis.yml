@@ -43,6 +43,12 @@ apis:
   - Data Platform
   - Recordings
   - Devices
+  - Event
+  tags_raw:
+  - Robotics
+  - Data Platform
+  - Recordings
+  - Devices
   - Events
   properties:
   - type: OpenAPI
