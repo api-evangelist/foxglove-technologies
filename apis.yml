@@ -28,39 +28,504 @@ tags:
 - MCAP
 - ROS
 apis:
-- aid: foxglove-technologies-api
-  name: Foxglove API
-  description: The Foxglove REST API provides programmatic access to the Foxglove
-    data platform — devices, device tokens, recordings, sessions, events, event types,
-    custom properties, coverage, topics, data streaming and upload, sites and site
-    tokens, lake files, projects, extensions and layouts. Authenticated with an
-    organization API key presented as an HTTP bearer token, with per-endpoint
-    capability requirements.
+- aid: foxglove-technologies:foxglove-technologies-coverage-api
+  name: Foxglove Technologies Coverage API
+  description: Coverage provides the ability to see which time spans are available within Foxglove.
   humanURL: https://docs.foxglove.dev/api
   baseURL: https://api.foxglove.dev/v1
   tags:
-  - Robotics
-  - Data Platform
-  - Recordings
-  - Devices
-  - Event
-  tags_raw:
-  - Robotics
-  - Data Platform
-  - Recordings
-  - Devices
-  - Events
+  - Coverage
   properties:
   - type: OpenAPI
-    url: openapi/foxglove-technologies-openapi-original.yml
+    url: openapi/foxglove-technologies-coverage-api-openapi.yml
   - type: Documentation
     url: https://docs.foxglove.dev/api
   - type: Authentication
     url: authentication/foxglove-technologies-authentication.yml
   - type: ToolCrosswalk
     url: mcp/foxglove-technologies-tool-crosswalk.yml
-  - type: Overlay
-    url: overlays/foxglove-technologies-api-overlay.yaml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-custom-properties-api
+  name: Foxglove Technologies Custom Properties API
+  description: >-
+    Custom properties are typed metadata which you can assign to devices.
+
+
+    For example, you can create a device custom property identified with a key
+
+    `locationId` and a type of `string`. This enables you to assign a location
+
+    to each of your devices, view that data in Foxglove, and filter devices by
+
+    a location ID.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Custom Properties
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-custom-properties-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-device-tokens-api
+  name: Foxglove Technologies Device Tokens API
+  description: Device tokens authenticate a device to the API.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Device Tokens
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-device-tokens-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-devices-api
+  name: Foxglove Technologies Devices API
+  description: >-
+    Devices represent robots in your organization. It is common to have devices for both physical
+
+    and virtual robots.
+
+
+    Devices are referenced by other resources like recordings and events.
+
+
+    A device may have [Foxlet](https://docs.foxglove.dev/docs/fleet/foxlet)
+
+    installed on it. In this case, you may configure the retention period for recordings on the
+
+    device by setting its `retainRecordingsSeconds`.
+
+
+    To help manage your devices, you may define [custom properties](#tag/Custom-Properties) and
+
+    assign metadata to each device via its `properties`.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Devices
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-devices-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-event-types-api
+  name: Foxglove Technologies Event Types API
+  description: >-
+    Event types help ensure data quality through validation, enable better filtering and analytics,
+
+    and provide visual distinctions between categories of events.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Event Types
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-event-types-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-events-api
+  name: Foxglove Technologies Events API
+  description: >-
+    Adding events can help you quickly identify, categorize, and search for points of interest in
+
+    your data. Each event is tied to a device and time span, and can contain metadata.
+
+
+    You can list events by devices, time ranges, and metadata.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-events-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-extensions-api
+  name: Foxglove Technologies Extensions API
+  description: The Extensions API from Foxglove Technologies — 3 operation(s) for extensions.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Extensions
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-extensions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-imports-api
+  name: Foxglove Technologies Imports API
+  description: >-
+    **The Imports endpoints are deprecated. Use the [Recordings](#tag/Recordings) endpoints instead.**
+
+
+    Imports are recordings that are available at a Primary Site.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Imports
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-imports-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-lake-files-api
+  name: Foxglove Technologies Lake files API
+  description: >-
+    MCAP files stored in the lake bucket of a [self-hosted Primary Site](https://docs.foxglove.dev/docs/primary-sites#self-hosted).
+
+    You must have an Enterprise account to use lake file endpoints.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Lake files
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-lake-files-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-layouts-api
+  name: Foxglove Technologies Layouts API
+  description: The Layouts API from Foxglove Technologies — 3 operation(s) for layouts.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Layouts
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-layouts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-projects-api
+  name: Foxglove Technologies Projects API
+  description: >-
+    [Projects](https://docs.foxglove.dev/docs/projects) are a container for organizing data and resources
+    in Foxglove.
+
+    Your plan must support managing projects.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Projects
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-projects-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-properties-api
+  name: Foxglove Technologies Properties API
+  description: The Properties API from Foxglove Technologies — 3 operation(s) for properties.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Properties
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-properties-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-recording-attachments-api
+  name: Foxglove Technologies Recording Attachments API
+  description: >-
+    A recording attachment resource represents information about an MCAP attachment
+
+    imported to Foxglove.
+
+
+    Attachments are available for individual download or with their recording.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Recording Attachments
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-recording-attachments-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-recordings-api
+  name: Foxglove Technologies Recordings API
+  description: >-
+    A recording is a resource representing the content of an MCAP file or ROS bag managed by Data
+
+    Platform.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Recordings
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-recordings-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-sessions-api
+  name: Foxglove Technologies Sessions API
+  description: >-
+    Sessions are logical groupings of recordings from a single device. They allow you to manage
+
+    and interact with recording data independent of how the recordings are stored.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Sessions
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-sessions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-site-inbox-notification-tokens-api
+  name: Foxglove Technologies Site Inbox Notification Tokens API
+  description: >-
+    Site inbox notification tokens are credentials used to authenticate bucket notifications for a [Primary
+    Site](https://docs.foxglove.dev/docs/primary-sites) (self-managed or BYOS) to the Foxglove API.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Site Inbox Notification Tokens
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-site-inbox-notification-tokens-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-site-tokens-api
+  name: Foxglove Technologies Site Tokens API
+  description: >-
+    Site tokens are credentials a [self-hosted Primary Site](https://docs.foxglove.dev/docs/primary-sites#self-hosted)
+    or [Edge Site](https://docs.foxglove.dev/docs/edge-sites) use to communicate with the Foxglove API.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Site Tokens
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-site-tokens-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-sites-api
+  name: Foxglove Technologies Sites API
+  description: A site is a logical grouping of storage and compute for storing Recording data.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Sites
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-sites-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-stream-data-api
+  name: Foxglove Technologies Stream data API
+  description: The Stream data API from Foxglove Technologies — 1 operation(s) for stream data.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Stream data
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-stream-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
+  - type: ErrorCatalog
+    url: errors/foxglove-technologies-problem-types.yml
+  - type: DataModel
+    url: data-model/foxglove-technologies-data-model.yml
+  - type: RateLimits
+    url: rate-limits/foxglove-technologies-rate-limits.yml
+- aid: foxglove-technologies:foxglove-technologies-topics-api
+  name: Foxglove Technologies Topics API
+  description: Topics provide schema information for messages in the data source.
+  humanURL: https://docs.foxglove.dev/api
+  baseURL: https://api.foxglove.dev/v1
+  tags:
+  - Topics
+  properties:
+  - type: OpenAPI
+    url: openapi/foxglove-technologies-topics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.foxglove.dev/api
+  - type: Authentication
+    url: authentication/foxglove-technologies-authentication.yml
+  - type: ToolCrosswalk
+    url: mcp/foxglove-technologies-tool-crosswalk.yml
   - type: ErrorCatalog
     url: errors/foxglove-technologies-problem-types.yml
   - type: DataModel
@@ -73,6 +538,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/foxglove-technologies-api-overlay.yaml
 - type: Packages
   url: packages/foxglove-technologies-packages.yml
 - type: SDKs
