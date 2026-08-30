@@ -1,0 +1,607 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Events API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Events
+  description: 'Adding events can help you quickly identify, categorize, and search for points of interest in
+
+    your data. Each event is tied to a device and time span, and can contain metadata.
+
+
+    You can list events by devices, time ranges, and metadata.
+
+    '
+paths:
+  /events:
+    get:
+      tags:
+      - Events
+      security:
+      - ApiKey:
+        - events.list
+      summary: List events
+      description: 'Retrieve a list of events.
+
+
+        Use the `query` parameter to filter events on key/value criteria.
+
+        The `queryFields` parameter can be used in combination with `query` to specify
+
+        which fields to filter events by.
+
+
+        Syntax:
+
+
+        * `key:value`: matches events with metadata that contains a key named `key` with a value of `value`; use double quotes if the value contains spaces or special characters
+
+        * `key:value1,value2`: matches events with metadata that contains a key named `key` with a value of either `value1` or `value2`
+
+        * `key:*`: matches events where any metadata that contains a key named `key`
+
+        * `*:value`: matches events where any metadata that contains `value` as a value
+
+        * `foo`: matches events with metadata where any key or value string contains `foo`
+
+
+        Multiple qualifiers can be used in the same query string; this will filter events where metadata matches the intersection of the qualifiers (AND).
+
+
+        Examples:
+
+
+        * `key1:value1 key2:value2`: matches metadata that contains both a key named `key1` with its value `value1` and another key named `key2` with its value `value2`
+
+        * `key:"value with spaces"`: matches metadata with a key named `key` and its value `value with spaces`
+
+        * `key:value foo`: matches metadata that contains both a key named `key` with its value `value` and any key or value that contains the text `foo`
+
+
+        > Note: The `start` and `end` query arguments will find any events which intersect the query range (inclusive of start and end).
+
+        '
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\nfrom datetime import datetime, timedelta\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.get_events(\n    device_id=device_id,\n    sort_by=sort_by,\n    sort_order=sort_order,\n    limit=limit,\n    offset=offset,\n    start=datetime.now() - timedelta(hours=3),\n    end=datetime.now() - timedelta(hours=1),\n    query=\"key:val\"\n)\n"
+      parameters:
+      - $ref: '#/components/parameters/start'
+      - $ref: '#/components/parameters/end'
+      - in: query
+        name: createdAfter
+        description: 'Return all events created after this date and time
+
+          '
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: updatedAfter
+        description: 'Return all events updated after this date and time
+
+          '
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: projectId
+        description: Filter events by project
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: deviceId
+        description: Filter events matching device ID
+        schema:
+          type: string
+      - in: query
+        name: eventId
+        description: Filter events by exact event ID
+        schema:
+          type: string
+      - in: query
+        name: deviceName
+        description: Name of device associated with the event
+        schema:
+          type: string
+      - in: query
+        name: device.name
+        description: Equivalent to deviceName, and ignored if deviceName is supplied
+        schema:
+          type: string
+        deprecated: true
+      - in: query
+        name: device.id
+        description: Equivalent to deviceId, and ignored if deviceId is supplied
+        schema:
+          type: string
+        deprecated: true
+      - in: query
+        name: query
+        description: Event query string. Comprises a space-separated list of event queries, where the syntax of those queries is described above.
+        schema:
+          type: string
+      - in: query
+        name: queryFields
+        description: Which fields to query events by. Defaults to "metadata".
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - metadata
+            - properties
+      - in: query
+        name: sortBy
+        description: field to sort response items by
+        schema:
+          type: string
+          enum:
+          - id
+          - deviceId
+          - deviceName
+          - device.name
+          - device.id
+          - start
+          - createdAt
+          - updatedAt
+      - in: query
+        name: eventTypeId
+        description: Filter events by their event type.
+        schema:
+          type: string
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: A list of device events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      tags:
+      - Events
+      security:
+      - ApiKey:
+        - events.create
+      x-projectIdOptional: true
+      summary: Create an event
+      description: "Create a new event.\n\nNote: Creating an new event currently requires a device ID or device\n  name, however the `device` field on the Event resource responses is\n  optional to allow future API expansion for attaching events to other\n  types of resources.\n"
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\nfrom datetime import datetime, timedelta\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nevent_time = datetime.now()\n\nclient.create_event(\n    device_id=device_id,\n    start=event_time,\n    end=event_time,\n    metadata={\"message\": \"Hi from python!\"}\n)\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreateInput'
+      responses:
+        '200':
+          description: The created event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+  /events/{id}:
+    parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: ID of the event
+    get:
+      tags:
+      - Events
+      summary: Get an event
+      security:
+      - ApiKey:
+        - events.list
+      responses:
+        '200':
+          description: The event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+    delete:
+      tags:
+      - Events
+      security:
+      - ApiKey:
+        - events.delete
+      summary: Delete an event
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.delete_event(\n    event_id=event_id,\n)\n"
+      responses:
+        '200':
+          description: ID of the deleted event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDeleteResponse'
+    patch:
+      tags:
+      - Events
+      summary: Update an event
+      security:
+      - ApiKey:
+        - events.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateInput'
+      responses:
+        '200':
+          description: The updated event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+components:
+  parameters:
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    EventUpdateEventTypeIdInput:
+      type: string
+      description: If provided, the event must conform to the event type's schema. An empty string will remove the event type.
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the event
+        start:
+          type: string
+          format: date-time
+          description: Event start time (inclusive)
+        end:
+          type: string
+          format: date-time
+          description: Event end time (inclusive)
+        deviceId:
+          type: string
+          deprecated: true
+          description: 'ID of the device associated with the event.
+
+
+            **deprecated**: Use `device.id` instead.
+
+            '
+        device:
+          $ref: '#/components/schemas/DeviceSummary'
+        metadata:
+          type: object
+          additionalProperties: true
+          required: []
+          description: Any metadata associated with the event
+        createdAt:
+          type: string
+          format: date-time
+          description: When the event was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the event was last updated
+        eventTypeId:
+          type: string
+          description: ID of the event type.
+        properties:
+          $ref: '#/components/schemas/CustomPropertyValues'
+          description: 'A key-value map of the custom properties associated with this event.
+
+            '
+      required:
+      - id
+      - start
+      - end
+      - metadata
+      - createdAt
+      - updatedAt
+    EventUpdatePropertiesInput:
+      description: 'A key-value map, where each key is one of your pre-defined event custom property keys.
+
+        Keys which are not recognized as custom properties will be ignored.
+
+        Keys which are not included in the request, but exist on the event, will be unchanged.
+
+        To unset a property, pass `null` as the value.
+
+        '
+      type: object
+      additionalProperties: true
+      required: []
+    EventMetadataInput:
+      type: object
+      additionalProperties:
+        type: string
+      required: []
+      description: An object with user-defined string keys and string values; key order is not preserved
+    EventDeleteResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the deleted event.
+      required:
+      - id
+    EventCreateInput:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: ID of the device to associate with the event
+        deviceName:
+          type: string
+          description: Name of the device to associate with the event
+        projectId:
+          type: string
+          description: Optional project ID used to disambiguate deviceName and deviceId lookups
+        device.id:
+          type: string
+          description: Equivalent to deviceId, and ignored if deviceId is supplied
+          deprecated: true
+        device.name:
+          type: string
+          description: Equivalent to deviceName, and ignored if deviceName is supplied
+          deprecated: true
+        metadata:
+          $ref: '#/components/schemas/EventMetadataInput'
+        start:
+          type: string
+          description: Event start time (inclusive)
+          format: date-time
+        end:
+          type: string
+          description: Event end time (inclusive)
+          format: date-time
+        eventTypeId:
+          type: string
+          description: If provided, the event must conform to the event type's schema.
+        properties:
+          $ref: '#/components/schemas/CustomPropertyValues'
+          description: 'A key-value map, where each key is one of your pre-defined event custom property keys.
+
+            Keys which are not recognized as custom properties will be ignored.
+
+            '
+          required: []
+      required:
+      - start
+      - end
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    EventUpdateInput:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/EventMetadataInput'
+        start:
+          type: string
+          description: Event start time (inclusive)
+          format: date-time
+        end:
+          type: string
+          description: Event end time (inclusive)
+          format: date-time
+        properties:
+          $ref: '#/components/schemas/EventUpdatePropertiesInput'
+        eventTypeId:
+          $ref: '#/components/schemas/EventUpdateEventTypeIdInput'
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

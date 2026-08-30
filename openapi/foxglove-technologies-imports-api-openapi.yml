@@ -1,0 +1,432 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Imports API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Imports
+  description: '**The Imports endpoints are deprecated. Use the [Recordings](#tag/Recordings) endpoints instead.**
+
+
+    Imports are recordings that are available at a Primary Site.
+
+    '
+paths:
+  /data/imports:
+    get:
+      deprecated: true
+      tags:
+      - Imports
+      summary: List imports
+      description: '**This endpoint is deprecated. Use the [list recordings](#tag/Recordings/paths/~1recordings/get) endpoint instead.**
+
+        '
+      security:
+      - ApiKey:
+        - data.imports.list
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: 'from foxglove.client import Client
+
+
+          token = "<YOUR API TOKEN HERE>"
+
+          client = Client(token=token)
+
+
+          client.get_imports()
+
+          '
+      parameters:
+      - in: query
+        name: deviceId
+        description: ID of device associated with the exported data
+        schema:
+          type: string
+      - in: query
+        name: filename
+        description: Filename to match
+        schema:
+          type: string
+      - $ref: '#/components/parameters/start'
+        description: Inclusive start of import time
+      - $ref: '#/components/parameters/end'
+        description: Inclusive end of import time
+      - in: query
+        name: dataStart
+        description: Inclusive start of message log time
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: dataEnd
+        description: Inclusive end of message log time
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: sortBy
+        description: Sort by a single field of the import type
+        schema:
+          type: string
+          enum:
+          - importId
+          - deviceId
+          - importTime
+          - dataStart
+          - dataEnd
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Import'
+    delete:
+      deprecated: true
+      tags:
+      - Imports
+      summary: Delete multiple imports
+      description: 'Deletes multiple imports by ID. Returns an array of result objects, which indicate whether a given import was successfully deleted. An import that has already been deleted will result in "notFound".
+
+        _Note: All imports must belong to the same site. If any import belongs to a different site, the entire request is rejected with a 400 response._'
+      security:
+      - ApiKey:
+        - data.imports.delete
+      parameters:
+      - in: query
+        name: id
+        description: ID of import to delete. You can specify up to 50 IDs (for example, `?id=abc&id=def&...`).
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+            description: an import ID
+          maxItems: 50
+        style: form
+        explode: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deletionResults:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        importId:
+                          type: string
+                          description: The import ID that was provided
+                        result:
+                          type: string
+                          description: The result of the deletion attempt.
+                          enum:
+                          - success
+                          - notFound
+                      required:
+                      - importId
+                      - result
+                required:
+                - deletionResults
+  /data/imports/{importId}:
+    parameters:
+    - in: path
+      name: importId
+      schema:
+        type: string
+      required: true
+      description: The `importId` of an import
+    delete:
+      deprecated: true
+      tags:
+      - Imports
+      summary: Delete an import
+      description: '**This endpoint is deprecated. Use the [delete recording](#tag/Recordings/paths/~1recordings~1%7Bid%7D/delete) endpoint instead.**
+
+
+        Deleting an import deletes all data associated with the import.
+
+
+        **This action is permanent and cannot be undone.**
+
+        '
+      security:
+      - ApiKey:
+        - data.imports.delete
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.delete_import(\n    device_id=device_id,\n    import_id=import_id,\n)\n"
+      parameters:
+      - in: query
+        name: deviceId
+        deprecated: true
+        description: The deviceId from the import record
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                required:
+                - id
+components:
+  parameters:
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    Import:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Opaque ID
+        importId:
+          type: string
+          deprecated: true
+        orgId:
+          type: string
+        deviceId:
+          type: string
+        deviceName:
+          type: string
+        filename:
+          type: string
+        importTime:
+          type: string
+          format: date-time
+          description: Imported timestamp
+        start:
+          type: string
+          format: date-time
+          description: Message log time start of imported data
+        end:
+          type: string
+          format: date-time
+          description: Message log time end of imported data
+        inputType:
+          type: string
+          description: 'Supported input type: ROS 1 bag ("bag1") or MCAP v0.x ("mcap0") file'
+        outputType:
+          type: string
+          description: 'Supported output type: ROS 1 bag ("bag1") or MCAP v0.x ("mcap0") file'
+        inputSize:
+          type: number
+          description: Size in bytes of the uploaded file
+          format: bigint
+        totalOutputSize:
+          type: number
+          description: Size in bytes of the data after processing
+          format: bigint
+        date:
+          type: string
+          description: Message log time start date in YYYYMMDD format e.g. 20170322
+        deleted:
+          type: boolean
+      required:
+      - id
+      - importId
+      - orgId
+      - filename
+      - importTime
+      - start
+      - end
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

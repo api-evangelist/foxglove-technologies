@@ -1,0 +1,489 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Sites API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Sites
+  description: 'A site is a logical grouping of storage and compute for storing Recording data.
+
+    '
+paths:
+  /sites:
+    get:
+      tags:
+      - Sites
+      summary: List sites
+      description: 'Retrieve a list of sites.
+
+        '
+      security:
+      - ApiKey:
+        - sites.list
+      responses:
+        '200':
+          description: List of sites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Site'
+    post:
+      tags:
+      - Sites
+      summary: Create a Site
+      description: 'Create a new site.
+
+        '
+      security:
+      - ApiKey:
+        - sites.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: A name for this site
+                type:
+                  type: string
+                  description: 'The type of site to create.
+
+                    '
+                  enum:
+                  - self-hosted
+                  - edge
+                retainRecordingsSeconds:
+                  type: number
+                  minimum: 0
+                  description: 'Optionally set a retention period for recordings created at
+
+                    this site. If set to zero, recordings are retained indefinitely.
+
+                    (only available on Edge Sites)
+
+                    '
+              required:
+              - name
+              - type
+      responses:
+        '200':
+          description: The new site
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+  /sites/{id}:
+    parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: Site ID
+    get:
+      tags:
+      - Sites
+      summary: Get site details
+      security:
+      - ApiKey:
+        - sites.list
+      description: 'Get details for a specific site.
+
+        '
+      responses:
+        '200':
+          description: Site
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+    patch:
+      tags:
+      - Sites
+      summary: Update site details
+      description: 'Update the name or retention period for a Site.
+
+        '
+      security:
+      - ApiKey:
+        - sites.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: A name for this site
+                retainRecordingsSeconds:
+                  type: number
+                  description: 'Optionally set a retention period for recordings created at this Edge Site.
+
+                    If set to zero, recordings are retained indefinitely.
+
+                    (only available on Edge Sites)
+
+                    '
+                url:
+                  type: string
+                  description: 'The URL a self-hosted Primary Site exposes for accessing available data.
+
+                    See [The self-hosting installation guide](https://docs.foxglove.dev/docs/primary-sites/self-hosting/installation#configure-foxglove)
+
+                    for details.
+
+                    '
+      responses:
+        '200':
+          description: Updated site
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+    delete:
+      tags:
+      - Sites
+      summary: Delete a site
+      security:
+      - ApiKey:
+        - sites.delete
+      description: 'Delete a site.
+
+
+        _NOTE: Site deletion is permanent and cannot be undone. Any recordings stored at this site
+
+        will no longer be available through Foxglove._
+
+
+        For `edge` and `self-hosted` sites, you should shut down your deployment before deleting
+
+        the site through the API.
+
+
+        If the site type is `self-hosted`, the contents of your inbox and lake buckets will not be
+
+        affected by this action, and should be cleaned up separately after deleting the site.
+
+
+        If the site type is `edge`, any files in edge storage will not be affected by this action.
+
+        '
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the deleted site
+                required:
+                - id
+  /site-bucket-notifications:
+    post:
+      tags:
+      - Sites
+      summary: Notify new recording
+      description: 'Notify your primary site of a new recording to ingest. Most users should set up [Bucket
+
+        notifications](/docs/data/primary-sites/installation#bucket-push-notification)
+
+        instead.
+
+
+        This endpoint requires a Site Bucket Notification Token as bearer token in the Authorization header:
+
+
+        ```
+
+        Authorization: Bearer fox_snt_1234...
+
+        ```
+
+        '
+      security:
+      - SiteBucketNotificationBearerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messageId:
+                  type: string
+                  description: Unique message identifier. Notifications will be deduplicated based on this value.
+                fileName:
+                  type: string
+                  description: The name of the recording file in the bucket.
+                  minLength: 1
+                bucketName:
+                  type: string
+                  description: Bucket name
+                  minLength: 1
+                storageProvider:
+                  type: string
+                  enum:
+                  - google_cloud
+                  - aws
+                  - azure
+                  - s3_compatible
+                  description: 'Storage provider used for the bucket. This must match the storage provider
+
+                    configured for your primary site''s inbox bucket or indexed bucket.
+
+                    '
+                deviceId:
+                  type: string
+                  description: 'Device to associate with the recording. This takes precedence over values
+
+                    provided in [object metadata or MCAP metadata](/docs/primary-sites/self-hosting/manage-data#adding-metadata-to-imports).
+
+                    '
+                  minLength: 1
+                deviceName:
+                  type: string
+                  description: 'Name of the device to associate with the recording. The device is looked up by
+
+                    name and created if it does not already exist. `deviceId` takes precedence over
+
+                    `deviceName` when both are provided. An existing device with a unique name
+
+                    resolves without a `projectId`. Provide `projectId` to disambiguate when the
+
+                    name matches devices in multiple projects, or to choose which project a new
+
+                    device is created in when your organization has multiple projects. This takes
+
+                    precedence over values provided in
+
+                    [object metadata or MCAP metadata](/docs/primary-sites/self-hosting/manage-data#adding-metadata-to-imports).
+
+                    '
+                  minLength: 1
+                projectId:
+                  type: string
+                  description: 'Project to associate with the recording. This takes precedence over values
+
+                    provided in [object metadata or MCAP metadata](/docs/primary-sites/self-hosting/manage-data#adding-metadata-to-imports).
+
+                    '
+                  minLength: 1
+              required:
+              - messageId
+              - fileName
+              - bucketName
+              - storageProvider
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccess'
+components:
+  schemas:
+    GenericSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+      required:
+      - success
+    Site:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this site
+        name:
+          type: string
+          description: Name for this site
+        type:
+          type: string
+          description: 'The type of the site.
+
+            - `foxglove-hosted`: A [Foxglove-hosted Primary Site](https://docs.foxglove.dev/docs/primary-sites#foxglove-hosted).
+
+            - `self-hosted`: A [self-hosted Primary Site](https://docs.foxglove.dev/docs/primary-sites#self-hosted).
+
+            - `edge`: An [Edge Site](https://docs.foxglove.dev/docs/edge-sites).
+
+            - `byob`: A [Bring Your Own Storage Site](https://docs.foxglove.dev/docs/primary-sites#bring-your-own-storage).
+
+            '
+          enum:
+          - foxglove-hosted
+          - self-hosted
+          - edge
+          - byob
+        url:
+          type: string
+          description: 'The REST API endpoint your site deployment exposes
+
+            (only available for self-hosted Primary Sites).
+
+            '
+        retainRecordingsSeconds:
+          type: number
+          minimum: 0
+          description: 'An optional retention period for recordings created at this site. If set to zero, recordings are retained indefinitely. (only available on Edge Sites)
+
+            '
+      required:
+      - id
+      - name
+      - type
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

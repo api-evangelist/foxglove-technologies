@@ -1,0 +1,563 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Sessions API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Sessions
+  description: 'Sessions are logical groupings of recordings from a single device. They allow you to manage
+
+    and interact with recording data independent of how the recordings are stored.
+
+    '
+paths:
+  /sessions:
+    get:
+      tags:
+      - Sessions
+      summary: List sessions
+      description: 'Retrieve a list of recording sessions.
+
+
+        **Filtering by custom properties**
+
+
+        Use the `query` parameter to filter sessions on custom properties.
+
+        Syntax:
+
+        * `key:value`: matches sessions with a property that contains a key named `key` with a value of `value`; use double quotes if the value contains spaces or special characters
+
+        * `key:value1,value2`: matches sessions with a property that contains a key named `key` and its value is either `value1` or `value2`
+
+        * `key:*`: matches sessions with a property that contains a key named `key` and any value
+
+        * `*:value`: matches sessions with a property where any key has the value `value`
+
+        * `foo`: matches sessions with properties where any key or stringified value contains `foo`
+
+        Multiple qualifiers can be used in the same query string; this will filter sessions matching the intersection of the qualifiers (AND).
+
+        '
+      security:
+      - ApiKey:
+        - sessions.list
+      parameters:
+      - in: query
+        name: projectId
+        description: Filter sessions by project
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: deviceId
+        description: Filter sessions by device ID
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: deviceName
+        description: Filter sessions by device name
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: keyMatches
+        description: Partial match on session key (case-insensitive)
+        schema:
+          type: string
+        required: false
+      - $ref: '#/components/parameters/start'
+      - $ref: '#/components/parameters/end'
+      - in: query
+        name: sortBy
+        description: Field to sort items by ("id", "createdAt", "updatedAt")
+        schema:
+          type: string
+          enum:
+          - id
+          - createdAt
+          - updatedAt
+        required: false
+      - in: query
+        name: query
+        description: Space-separated query string for session custom properties. Each custom property key must be valid. See above for syntax and examples.
+        schema:
+          type: string
+        required: false
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: List of recording sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordingSessionListItem'
+    post:
+      tags:
+      - Sessions
+      summary: Create a session
+      description: 'Create a new recording session. Either `deviceId` or `recordingIds` must be provided.
+
+        If `recordingIds` are provided without a `deviceId`, the device is inferred from the
+
+        recordings, which must all belong to the same device. The session inherits its org and
+
+        project from the device.
+
+        '
+      security:
+      - ApiKey:
+        - sessions.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceId:
+                  description: The ID of the device to associate with the session. If omitted, inferred from `recordingIds`.
+                  type: string
+                key:
+                  description: A user-supplied identifier, unique within the project.
+                  minLength: 1
+                  type: string
+                recordingIds:
+                  description: IDs of recordings to associate with the new session. All recordings must belong to the same device and project.
+                  type: array
+                  items:
+                    type: string
+                properties:
+                  $ref: '#/components/schemas/CustomPropertyValues'
+                  description: 'A key-value map, where each key is one of your pre-defined session custom property keys.
+
+                    Keys which are not recognized as custom properties will be ignored.
+
+                    '
+                  required: []
+      responses:
+        '200':
+          description: The newly created session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordingSession'
+  /sessions/{keyOrId}:
+    parameters:
+    - in: path
+      name: keyOrId
+      schema:
+        type: string
+      required: true
+      description: Recording Session Key or ID
+    get:
+      tags:
+      - Sessions
+      summary: Get a session
+      description: 'Get details on a specific session.
+
+        '
+      security:
+      - ApiKey:
+        - sessions.list
+      parameters:
+      - in: query
+        name: projectId
+        schema:
+          type: string
+        description: Filter sessions by project. Required for multi-project orgs.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordingSession'
+    patch:
+      tags:
+      - Sessions
+      summary: Update recordings in a session
+      description: Add or remove recordings associated with the session. All recordings must belong to the same device and project.
+      security:
+      - ApiKey:
+        - sessions.update
+      parameters:
+      - in: query
+        name: projectId
+        schema:
+          type: string
+        description: Filter sessions by project. Required for multi-project orgs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                addRecordingIds:
+                  type: array
+                  items:
+                    type: string
+                  description: Recording display IDs to add to the session.
+                removeRecordingIds:
+                  type: array
+                  items:
+                    type: string
+                  description: Recording display IDs to remove from the session.
+                properties:
+                  description: 'Custom properties to assign to the session.
+
+                    Keys which are not included in the request, but exist on the session, will be unchanged.
+
+                    To unset a property, pass `null` as the value.
+
+                    '
+                  type: object
+                  additionalProperties: true
+                  required: []
+      responses:
+        '200':
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordingSession'
+    delete:
+      tags:
+      - Sessions
+      summary: Delete a session
+      description: 'Soft-delete a recording session and unlink all recordings from it.
+
+        Does not delete recording data.
+
+        '
+      security:
+      - ApiKey:
+        - sessions.delete
+      parameters:
+      - in: query
+        name: projectId
+        schema:
+          type: string
+        description: Filter sessions by project. Required for multi-project orgs.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the deleted session
+                required:
+                - id
+components:
+  parameters:
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
+    RecordingSession:
+      type: object
+      description: 'A recording session represents a logical grouping of recordings from a single device.
+
+        '
+      properties:
+        id:
+          type: string
+          description: ID of the recording session
+        projectId:
+          type: string
+          description: The project ID that the session belongs to
+        device:
+          $ref: '#/components/schemas/DeviceSummary'
+        key:
+          type: string
+          description: 'A user-supplied identifier, unique within the project.
+
+            '
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the session was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the session was last updated.
+        properties:
+          $ref: '#/components/schemas/CustomPropertyValues'
+          description: 'A key-value map of the custom properties associated with this session.
+
+            '
+        recordings:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of the recording
+              path:
+                type: string
+                description: 'The filepath of the recording as it was originally provided to Foxglove.
+
+                  For recordings originated at the edge, this is the full path of the recording file in
+
+                  the edge controller store. For recordings uploaded directly to Foxglove, this is
+
+                  the `filename` query arg provided to `/data/upload`.
+
+                  '
+              start:
+                type: string
+                format: date-time
+                description: The log time of the first message in the recording.
+              end:
+                type: string
+                format: date-time
+                description: The log time of the last message in the recording.
+            required:
+            - id
+            - path
+            - start
+            - end
+          description: Recordings associated with this session.
+      required:
+      - id
+      - projectId
+      - device
+      - createdAt
+      - updatedAt
+      - recordings
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    RecordingSessionListItem:
+      allOf:
+      - $ref: '#/components/schemas/RecordingSession'
+      - type: object
+        properties:
+          recordingCount:
+            type: number
+            readOnly: true
+            description: Number of recordings associated with this session.
+          recordingStart:
+            type: string
+            format: date-time
+            readOnly: true
+            description: Earliest log time among visible recordings associated with this session.
+          recordingEnd:
+            type: string
+            format: date-time
+            readOnly: true
+            description: Latest log time among visible recordings associated with this session.
+        required:
+        - recordingCount
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

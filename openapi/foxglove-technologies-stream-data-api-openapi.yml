@@ -1,0 +1,299 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Stream data API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Stream data
+paths:
+  /data/stream:
+    post:
+      tags:
+      - Stream data
+      summary: Download data
+      x-projectIdOptional: true
+      description: "This endpoint returns a `link` URL where you can download your data as an `.mcap` or `.bag`\nfile.\n\nTo download your data:\n  1. Make a request to this endpoint.\n  2. Make a `GET` request to the `link` URL.\n\nOne of `recordingId`, `key`, `importId` (deprecated) or all three of\n`deviceId`/`deviceName`, `start`, and `end` must be specified.\n\n_Note: You can only export a `.bag` file if you originally uploaded a `.bag` file._\n"
+      security:
+      - ApiKey:
+        - data.stream
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client, CompressionFormat, OutputFormat\nfrom datetime import datetime, timedelta\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nbytes = client.download_data(\n    device_id=device_id,\n    start=datetime.now() - timedelta(hours=3),\n    end=datetime.now() - timedelta(hours=1),\n    topics=[\"/clock\", \"/tracked_objects\"],\n    output_format=OutputFormat.mcap,\n    compression_format=CompressionFormat.lz4,\n    callback=lambda progress: print(\".\", end=\"\"),\n)\n\n# Or, to download using a recording ID:\nbytes = client.download_recording_data(id=\"rec_0dHT6g6cOfff9m5U\")\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topics:
+                  type: array
+                  items:
+                    type: string
+                  description: List of topics to include in the exported file (defaults to all topics)
+                outputFormat:
+                  type: string
+                  description: "Output file format.\n  * `bag1` - output a .bag file\n  * `mcap` - output a .mcap file\n  * `mcap0` - Deprecated. Use `mcap`.\n"
+                  enum:
+                  - bag1
+                  - mcap
+                  - mcap0
+                compressionFormat:
+                  type: string
+                  description: "Output compression format for chunks. Only valid if `outputFormat` is `mcap`.\n  * `\"\"` - no compression\n  * `zstd` - zstd compression\n  * `lz4` - LZ4 compression (default)\n"
+                  default: lz4
+                  enum:
+                  - ''
+                  - zstd
+                  - lz4
+                includeAttachments:
+                  type: boolean
+                  description: 'Include attachments in streamed data. One of `recordingId` or `importId`
+
+                    (deprecated) must also be set. Only valid for mcap outputFormat.
+
+                    '
+                isHosted:
+                  type: boolean
+                  description: true if the import is hosted
+                replayPolicy:
+                  type: string
+                  description: 'If set to "lastPerChannel", then the stream will include the most recent message
+
+                    on each channel, even if it comes before the requested `start`, as long as it is
+
+                    within the window of `replayLookbackSeconds` seconds before `start`.
+
+
+                    The default, `""` (no policy), means no messages before `start` are included.
+
+                    '
+                  enum:
+                  - lastPerChannel
+                  - ''
+                replayLookbackSeconds:
+                  type: number
+                  description: 'The maximum amount of time (in seconds) to look back before `start` in order to
+
+                    find the latest message. Only used if `replayPolicy` is set to "lastPerChannel".
+
+                    '
+                  minimum: 0
+                deviceId:
+                  type: string
+                  description: ID of device associated with the exported data
+                  minLength: 1
+                device.id:
+                  type: string
+                  description: Equivalent to deviceId, and ignored if deviceId is supplied
+                  deprecated: true
+                  minLength: 1
+                deviceName:
+                  type: string
+                  description: Name of device associated with the exported data.
+                  minLength: 1
+                device.name:
+                  type: string
+                  description: Equivalent to deviceName, and ignored if deviceName is supplied
+                  deprecated: true
+                  minLength: 1
+                start:
+                  type: string
+                  format: date-time
+                  description: Inclusive start of requested time range. If start is provided, end must be too.
+                end:
+                  type: string
+                  format: date-time
+                  description: Inclusive end of requested time range. If end is provided, start must be too.
+                importId:
+                  type: string
+                  description: ID of the import to stream
+                  deprecated: true
+                  minLength: 1
+                recordingId:
+                  type: string
+                  description: ID of the recording to stream
+                  minLength: 1
+                recordingKey:
+                  type: string
+                  description: Key of recording to stream
+                  minLength: 1
+                key:
+                  type: string
+                  deprecated: true
+                  description: Key of recording to stream
+                  minLength: 1
+                sessionId:
+                  type: string
+                  description: ID of a session to stream
+                  minLength: 1
+                sessionKey:
+                  type: string
+                  description: Key of a session to stream. Ensure projectId is provided if streaming by sessionKey.
+                  minLength: 1
+                projectId:
+                  type: string
+                  description: 'ID of a project to scope the streaming to. Recommended when streaming by deviceName.
+
+                    Required if the device name exists in multiple projects. Required when streaming by sessionKey.
+
+                    '
+                  minLength: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link:
+                    type: string
+                    description: A signed url to access the data. This link expires after 15 seconds.
+                required:
+                - link
+components:
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

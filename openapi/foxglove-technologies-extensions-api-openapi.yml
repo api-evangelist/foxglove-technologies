@@ -1,0 +1,350 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Extensions API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Extensions
+paths:
+  /extension-upload:
+    post:
+      tags:
+      - Extensions
+      summary: Publish an extension
+      description: '**Available on Free, Pro, and Enterprise plans**
+
+
+        Publish a new [Foxglove extension](https://docs.foxglove.dev/docs/extensions)
+
+        or an updated version of an existing extension. When uploaded, the extension will automatically be
+
+        installed for users in your organization.
+
+
+        See our packaging tool [`create-foxglove-extension`](https://github.com/foxglove/create-foxglove-extension/)
+
+        for more information on how to create an extension.
+
+
+        Read the [docs](https://docs.foxglove.dev/docs/extensions)
+
+        for more information on Foxglove extensions.'
+      requestBody:
+        description: 'The request headers must contain `Content-Type: application/octet-stream`.
+
+          The request body must contain the contents of your (`.foxe`) extension file.
+
+          All other information about the extension will be parsed from the package.json file.
+
+
+          **`package.json` requirements**
+
+
+          An extension is uniquely identified by its publisher and name, which are
+
+          both required in your `package.json`. Both values are case-insensitive,
+
+          so a package named `custompanel` would be the same as one named `CustomPanel`.
+
+
+          To update an extension, change its version in `package.json`, create a
+
+          new `.foxe` bundle, and upload it via this endpoint. Version numbers must
+
+          be unique to each extension. There are no other restrictions on versioning schemes.
+
+
+          To publish an extension to your organization, your `package.json` must define
+
+          a `displayName`. This is displayed to users in your organization.
+
+
+          Once an extension is uploaded, its `displayName` may not be changed by future versions.'
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      security:
+      - ApiKey:
+        - extensions.create
+      responses:
+        '200':
+          description: Extension ID
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+                required:
+                - id
+        '409':
+          description: Conflict with package name and version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /extensions:
+    get:
+      tags:
+      - Extensions
+      summary: List extensions
+      description: 'Organization admins can share and manage Foxglove extensions. Check out the
+
+        [docs](https://docs.foxglove.dev/docs/extensions) to learn more.'
+      security:
+      - ApiKey:
+        - extensions.list
+      responses:
+        '200':
+          description: List of extensions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Extension'
+  /extensions/{id}:
+    parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: Extension ID
+    get:
+      tags:
+      - Extensions
+      summary: Get an extension
+      security:
+      - ApiKey:
+        - extensions.list
+      responses:
+        '200':
+          description: Extension details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionWithSignedLink'
+    delete:
+      tags:
+      - Extensions
+      summary: Delete an extension
+      description: 'Once deleted, the extension will no longer be available within your organization.
+
+        '
+      security:
+      - ApiKey:
+        - extensions.delete
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the deleted extension
+                required:
+                - id
+components:
+  schemas:
+    ExtensionWithSignedLink:
+      allOf:
+      - $ref: '#/components/schemas/Extension'
+      - type: object
+        properties:
+          foxe:
+            type: string
+            description: Signed download link for the extension
+        required:
+        - foxe
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+    Extension:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Assigned by backend
+        name:
+          type: string
+          description: Name as it appears in your package.json
+        publisher:
+          type: string
+          description: Publisher as it appears in your package.json
+        displayName:
+          type: string
+          description: Display name as it appears in your package.json
+        description:
+          type: string
+          nullable: true
+          description: Description as it appears in the active version's package.json
+        activeVersion:
+          type: string
+          nullable: true
+          description: Version string as it appears in the active version's package.json
+        sha256Sum:
+          type: string
+          nullable: true
+          description: SHA-256 sum of the active version contents, encoded as hex
+      required:
+      - id
+      - name
+      - publisher
+      - displayName
+      - description
+      - activeVersion
+      - sha256Sum
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

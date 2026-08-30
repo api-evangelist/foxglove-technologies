@@ -1,0 +1,436 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Properties API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Properties
+paths:
+  /actions/devices/{nameOrId}/update-property-time-interval:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain non-URI-safe
+
+        characters. If a device is named with another device''s ID, the device with the matching
+
+        name will be returned.
+
+        '
+    post:
+      tags:
+      - Properties
+      summary: Update property time interval
+      description: 'Specify a value that was set for a given time range, or specify no value was set for that range.
+
+        Existing records overlapping that time range may be split, trimmed, or deleted to accommodate
+
+        this assertion. This endpoint should only be used for updating past time intervals. To update the
+
+        current value of a property use the [update device](#tag/Devices/paths/~1devices~1%7BnameOrId%7D/patch)
+
+        endpoint.
+
+        '
+      security:
+      - ApiKey:
+        - devices.update
+      x-projectIdOptional: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId:
+                  type: string
+                  description: 'The project ID of the device. Required for multi-project orgs.
+
+                    '
+                key:
+                  type: string
+                  description: 'The key of the property. Must be an existing device custom property
+
+                    key for your organization.
+
+                    '
+                value:
+                  description: 'The value of the property over the given time range. Omit to specify
+
+                    no value was set for that range.
+
+                    '
+                  oneOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: array
+                    items:
+                      type: string
+                    uniqueItems: true
+                start:
+                  type: string
+                  format: date-time
+                  description: Inclusive start of the property's effective time range. Must be in the past.
+                end:
+                  type: string
+                  format: date-time
+                  description: Exclusive end of the property's effective time range. Must be in the past.
+              required:
+              - key
+              - start
+              - end
+      responses:
+        '204':
+          description: Success
+  /devices/{nameOrId}/property-time-intervals:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain non-URI-safe
+
+        characters. If a device is named with another device''s ID, the device with the matching
+
+        name will be returned.
+
+        '
+    get:
+      tags:
+      - Properties
+      summary: List property time intervals
+      description: 'Returns a list of values and the time intervals for which they were in effect for a device.
+
+
+        Use the `query` parameter to filter property history on custom property key/value criteria.
+
+        Syntax:
+
+        * `key:value`: matches rows where the property key is `key` and the value equals `value`; use double quotes if the value contains spaces or special characters
+
+        * `key:value1,value2`: matches rows where the property key is `key` and the value is either `value1` or `value2`
+
+        * `key:*`: matches rows where the property key is `key` and any value
+
+        * `*:value`: matches rows where any key has the value `value`
+
+        * `foo`: matches rows where any key or stringified value contains `foo`
+
+        Multiple qualifiers can be used in the same query string; this will filter rows matching the intersection of the qualifiers (AND).
+
+        '
+      security:
+      - ApiKey:
+        - devices.list
+      x-projectIdOptional: true
+      parameters:
+      - in: query
+        name: projectId
+        description: The project ID that the device belongs to. Required for multi-project orgs.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: query
+        description: Space-separated query string for device property history. Each custom property key must be valid. See above for syntax and examples.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: start
+        description: Properties active on or after this time will be included.
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: end
+        description: Properties active before this time will be included.
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: sortBy
+        description: Field to sort items by ("id", "key", "start", "end")
+        schema:
+          type: string
+          enum:
+          - id
+          - key
+          - start
+          - end
+        required: false
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          description: Property time intervals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+  /devices/{nameOrId}/property-time-intervals/{id}:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain non-URI-safe
+
+        characters. If a device is named with another device''s ID, the device with the matching
+
+        name will be returned.
+
+        '
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: 'Property Time Interval ID.
+
+        '
+    get:
+      tags:
+      - Properties
+      summary: Get a device property time interval
+      description: 'Returns a specific device property time interval for a device.
+
+        '
+      security:
+      - ApiKey:
+        - devices.list
+      x-projectIdOptional: true
+      parameters:
+      - in: query
+        name: projectId
+        description: The project ID that the device belongs to. Required for multi-project orgs.
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Property time interval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+components:
+  schemas:
+    DeviceCustomPropertyTimeInterval:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the property time interval.
+        deviceId:
+          type: string
+          description: ID of the associated device.
+        key:
+          type: string
+          description: Key of the property.
+        value:
+          description: Value of the property.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+            uniqueItems: true
+        start:
+          type: string
+          format: date-time
+          description: Inclusive start time this value was in effect.
+        end:
+          type: string
+          format: date-time
+          description: Exclusive end time this value was in effect. When absent the value is still in effect.
+      required:
+      - id
+      - deviceId
+      - key
+      - value
+      - start
+  parameters:
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

@@ -1,0 +1,385 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Coverage API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Coverage
+  description: 'Coverage provides the ability to see which time spans are available within Foxglove.
+
+    '
+paths:
+  /data/coverage:
+    get:
+      tags:
+      - Coverage
+      summary: List coverage
+      description: 'A coverage range represents a time span for which Foxglove has data for a
+
+        given device.
+
+
+        You must specify the `start` and `end` arguments when making a coverage request.
+
+
+        Note: By default, only coverage ranges with imported recordings are returned. To include
+
+        coverage ranges with unimported recordings from an Edge Site or a device running Foxlet, set the
+
+        `includeEdgeRecordings` query parameter to true'
+      security:
+      - ApiKey:
+        - data.coverage.list
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\nfrom datetime import datetime, timedelta\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.get_coverage(\n    start=datetime.now() - timedelta(hours=3),\n    end=datetime.now() - timedelta(hours=1),\n)\n"
+      parameters:
+      - $ref: '#/components/parameters/start'
+      - $ref: '#/components/parameters/end'
+      - in: query
+        name: tolerance
+        description: 'Minimum interval (in seconds) that ranges must be separated by to be considered discrete.
+
+          Currently, the minimum meaningful value is 14s and smaller values will be clamped to this value.
+
+          '
+        schema:
+          type: number
+          minimum: 0
+        required: false
+      - in: query
+        name: deviceId
+        description: Filter coverage by device ID
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: deviceName
+        description: Name of device associated with the data
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: device.name
+        description: Equivalent to deviceName, and ignored if deviceName is supplied
+        schema:
+          type: string
+        required: false
+        deprecated: true
+      - in: query
+        name: device.id
+        description: Equivalent to deviceId, and ignored if deviceId is supplied
+        schema:
+          type: string
+        required: false
+        deprecated: true
+      - in: query
+        name: includeEdgeRecordings
+        description: 'Include recordings from an Edge Site or a device running Foxlet in the response.
+
+
+          When edge recordings are included, each item in the response array will also include the
+
+          `importStatus` for the coverage range.
+
+          '
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        deprecated: true
+        name: importId
+        description: Filter coverage by import ID
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: recordingId
+        description: Filter coverage by recording ID
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: recordingKey
+        description: Filter coverage by recordingKey
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sessionId
+        description: Filter coverage to recordings in the session with this ID
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sessionKey
+        description: Filter coverage to recordings in the session with this key
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: projectId
+        description: Filter coverage by project
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Coverage
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coverage'
+components:
+  parameters:
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    Coverage:
+      type: object
+      description: A coverage range represents a time span for which Foxglove has data for a given device. Recordings without devices are omitted except when queried by recording ID or import ID.
+      properties:
+        deviceId:
+          type: string
+          description: ID of device.
+        device:
+          description: Device summary.
+          $ref: '#/components/schemas/CoverageDeviceSummary'
+        start:
+          type: string
+          format: date-time
+          description: Start of this coverage
+        end:
+          type: string
+          format: date-time
+          description: End of this coverage
+        status:
+          type: string
+          deprecated: true
+          description: The status of the coverage range
+          enum:
+          - at-edge
+          - import-pending
+          - imported
+        importStatus:
+          $ref: '#/components/schemas/RecordingImportStatus'
+      required:
+      - start
+      - end
+      - status
+    CoverageDeviceSummary:
+      allOf:
+      - $ref: '#/components/schemas/DeviceSummary'
+      - type: object
+        properties:
+          pendingCoverageUpdate:
+            type: object
+            optional: true
+            description: 'If the device has a pending coverage update, this object will contain the timestamp when the coverage refresh was last enqueued.
+
+              If null, the device has no pending coverage update.
+
+              '
+            properties:
+              nextInvalidationRequestedAt:
+                type: string
+                format: date-time
+                description: The timestamp when the device's coverage refresh was last enqueued.
+    RecordingImportStatus:
+      type: string
+      description: 'The import status of recordings. Status will be one of:
+
+        - `none`: The recording has not yet been imported, and import has not been requested.
+
+        - `pending`: Foxglove has received a request to import this recording.
+
+        - `importing`: The recording data is being processed for access via Foxglove.
+
+        - `failed`: The recording data could not be imported.
+
+        - `complete`: The contents of the recording are available for access via Foxglove.
+
+
+        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
+
+
+        The set of `importStatus` values may expand in the future.
+
+        '
+      enum:
+      - none
+      - pending
+      - importing
+      - failed
+      - complete
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

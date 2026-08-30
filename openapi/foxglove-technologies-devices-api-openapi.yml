@@ -1,0 +1,843 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Devices API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Devices
+  description: 'Devices represent robots in your organization. It is common to have devices for both physical
+
+    and virtual robots.
+
+
+    Devices are referenced by other resources like recordings and events.
+
+
+    A device may have [Foxlet](https://docs.foxglove.dev/docs/fleet/foxlet)
+
+    installed on it. In this case, you may configure the retention period for recordings on the
+
+    device by setting its `retainRecordingsSeconds`.
+
+
+    To help manage your devices, you may define [custom properties](#tag/Custom-Properties) and
+
+    assign metadata to each device via its `properties`.
+
+    '
+paths:
+  /devices:
+    get:
+      tags:
+      - Devices
+      security:
+      - ApiKey:
+        - devices.list
+      summary: List devices
+      description: 'Retrieve a list of devices.
+
+
+        **Filtering by custom properties**
+
+
+        Use the `query` parameter to filter devices on custom properties.
+
+        Syntax:
+
+        * `properties.key:value`: matches devices with a property that contains a key named `key` with a value of `value`; use double quotes if the value contains spaces or special characters
+
+        * `properties.key:value1,value2`: matches devices with a property that contains a key named `key` and its value is either `value1` or `value2`
+
+        * `properties.key:*`: matches devices with a property that contains a key named `key` and any value
+
+        * `*:value`: matches devices with a property that contains a key with any name and a value of `value`
+
+        * `foo`: matches devices with properties where any key or stringified value contains `foo`
+
+        Multiple qualifiers can be used in the same query string; this will filter devices matching the intersection of the qualifiers (AND).
+
+        '
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: 'from foxglove.client import Client
+
+
+          token = "<YOUR API TOKEN HERE>"
+
+          client = Client(token=token)
+
+
+          client.get_devices()
+
+          '
+      parameters:
+      - in: query
+        name: projectId
+        description: Filter devices by project
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sortBy
+        description: Field to sort items by ("id", "name", or a custom property key prefixed with `properties.`)
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: query
+        description: Space-separated query string for device custom properties. Each custom property key must be valid and prefixed with "properties.". See above for syntax and examples.
+        schema:
+          type: string
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Device'
+                  - $ref: '#/components/schemas/DeviceDetails'
+                  - $ref: '#/components/schemas/DeviceRemoteAccessState'
+    post:
+      tags:
+      - Devices
+      summary: Create a device
+      security:
+      - ApiKey:
+        - devices.create
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.create_device(\n    name=name,\n    project_id=\"<YOUR PROJECT ID HERE>\",\n)\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/deviceName'
+                properties:
+                  $ref: '#/components/schemas/CustomPropertyValues'
+                  description: 'A key-value map, where each key is one of your pre-defined device custom property keys.
+
+                    Keys which are not recognized as custom properties will be ignored.
+
+                    '
+                  required: []
+                projectId:
+                  description: The project ID that the device belongs to. Required for multi-project orgs.
+                  type: string
+              required:
+              - name
+      responses:
+        '200':
+          description: The newly created device
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Device'
+                - $ref: '#/components/schemas/DeviceDetails'
+  /actions/devices/{nameOrId}/update-property-time-interval:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain non-URI-safe
+
+        characters. If a device is named with another device''s ID, the device with the matching
+
+        name will be returned.
+
+        '
+    post:
+      tags:
+      - Devices
+      summary: Update property time interval
+      description: 'Specify a value that was set for a given time range, or specify no value was set for that range.
+
+        Existing records overlapping that time range may be split, trimmed, or deleted to accommodate
+
+        this assertion. This endpoint should only be used for updating past time intervals. To update the
+
+        current value of a property use the [update device](#tag/Devices/paths/~1devices~1%7BnameOrId%7D/patch)
+
+        endpoint.
+
+        '
+      security:
+      - ApiKey:
+        - devices.update
+      x-projectIdOptional: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId:
+                  type: string
+                  description: 'The project ID of the device. Required for multi-project orgs.
+
+                    '
+                key:
+                  type: string
+                  description: 'The key of the property. Must be an existing device custom property
+
+                    key for your organization.
+
+                    '
+                value:
+                  description: 'The value of the property over the given time range. Omit to specify
+
+                    no value was set for that range.
+
+                    '
+                  oneOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: array
+                    items:
+                      type: string
+                    uniqueItems: true
+                start:
+                  type: string
+                  format: date-time
+                  description: Inclusive start of the property's effective time range. Must be in the past.
+                end:
+                  type: string
+                  format: date-time
+                  description: Exclusive end of the property's effective time range. Must be in the past.
+              required:
+              - key
+              - start
+              - end
+      responses:
+        '204':
+          description: Success
+  /devices/{nameOrId}:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain
+
+        non-URI-safe characters. If a device is named with another device''s ID,
+
+        the device with the matching name will be returned.
+
+        '
+    get:
+      tags:
+      - Devices
+      summary: Get a device
+      description: 'Get details on a specific device.
+
+        '
+      security:
+      - ApiKey:
+        - devices.list
+      x-projectIdOptional: true
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.get_device(\n    device_id=device_id,\n)\n"
+      parameters:
+      - in: query
+        name: projectId
+        description: Filter devices by project
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Device'
+                - $ref: '#/components/schemas/DeviceRemoteAccessState'
+    delete:
+      tags:
+      - Devices
+      summary: Delete a device
+      description: 'Delete a device. Once a device is deleted, it will no longer show up in your list of devices.
+
+
+        _Before deleting a device, you must delete all associated data._
+
+        '
+      security:
+      - ApiKey:
+        - devices.delete
+      x-projectIdOptional: true
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: 'from foxglove.client import Client
+
+
+          token = "<YOUR API TOKEN HERE>"
+
+          client = Client(token=token)
+
+
+          client.delete_device(device_id=device_id)
+
+          '
+      parameters:
+      - in: query
+        name: projectId
+        description: Filter devices by project
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the deleted device
+                required:
+                - id
+    patch:
+      tags:
+      - Devices
+      summary: Update a device
+      security:
+      - ApiKey:
+        - devices.update
+      x-projectIdOptional: true
+      parameters:
+      - in: query
+        name: projectId
+        description: Filter devices by project
+        schema:
+          type: string
+        required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Device names must be unique within a project.
+                retainRecordingsSeconds:
+                  type: integer
+                  minimum: 0
+                  description: 'Optionally set a retention period for recordings created on a device running
+
+                    Foxlet. If set to zero, recordings are retained indefinitely. This is only
+
+                    relevant for devices that have Foxlet installed.
+
+                    '
+                properties:
+                  description: 'A key-value map, where each key is one of your pre-defined device custom property keys.
+
+                    Keys which are not recognized as custom properties will be ignored.
+
+                    Keys which are not included in the request, but exist on the device, will be unchanged.
+
+                    To unset a property, pass `null` as the value.
+
+                    '
+                  type: object
+                  additionalProperties: true
+                  required: []
+                enabled:
+                  description: 'Whether this device is enabled. Devices are enabled by default,
+
+                    unless they are created with a device token with `preapproved` set to false.
+
+                    Disabled devices show up in the device list, but you can''t upload recordings
+
+                    for them. A device token linked to a disabled device does not grant access to the API.
+
+                    '
+                  type: boolean
+                remoteAccessEnabled:
+                  description: 'Whether remote access is enabled for this device. When disabled, the device
+
+                    cannot establish new remote access sessions.
+
+                    '
+                  type: boolean
+                autoDeleteAfterImport:
+                  description: 'Whether recordings on a device running Foxlet are automatically deleted
+
+                    once they have been successfully uploaded and accepted for import. This is
+
+                    only relevant for devices that have Foxlet installed. Foxlet versions
+
+                    older than 1.5.0 ignore this setting until upgraded.
+
+                    '
+                  type: boolean
+      responses:
+        '200':
+          description: Update device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+  /devices/{nameOrId}/property-time-intervals:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain non-URI-safe
+
+        characters. If a device is named with another device''s ID, the device with the matching
+
+        name will be returned.
+
+        '
+    get:
+      tags:
+      - Devices
+      summary: List property time intervals
+      description: 'Returns a list of values and the time intervals for which they were in effect for a device.
+
+
+        Use the `query` parameter to filter property history on custom property key/value criteria.
+
+        Syntax:
+
+        * `key:value`: matches rows where the property key is `key` and the value equals `value`; use double quotes if the value contains spaces or special characters
+
+        * `key:value1,value2`: matches rows where the property key is `key` and the value is either `value1` or `value2`
+
+        * `key:*`: matches rows where the property key is `key` and any value
+
+        * `*:value`: matches rows where any key has the value `value`
+
+        * `foo`: matches rows where any key or stringified value contains `foo`
+
+        Multiple qualifiers can be used in the same query string; this will filter rows matching the intersection of the qualifiers (AND).
+
+        '
+      security:
+      - ApiKey:
+        - devices.list
+      x-projectIdOptional: true
+      parameters:
+      - in: query
+        name: projectId
+        description: The project ID that the device belongs to. Required for multi-project orgs.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: query
+        description: Space-separated query string for device property history. Each custom property key must be valid. See above for syntax and examples.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: start
+        description: Properties active on or after this time will be included.
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: end
+        description: Properties active before this time will be included.
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: sortBy
+        description: Field to sort items by ("id", "key", "start", "end")
+        schema:
+          type: string
+          enum:
+          - id
+          - key
+          - start
+          - end
+        required: false
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          description: Property time intervals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+  /devices/{nameOrId}/property-time-intervals/{id}:
+    parameters:
+    - in: path
+      name: nameOrId
+      schema:
+        type: string
+      required: true
+      description: 'Device name or ID. Device names must be URI-encoded if they contain non-URI-safe
+
+        characters. If a device is named with another device''s ID, the device with the matching
+
+        name will be returned.
+
+        '
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: 'Property Time Interval ID.
+
+        '
+    get:
+      tags:
+      - Devices
+      summary: Get a device property time interval
+      description: 'Returns a specific device property time interval for a device.
+
+        '
+      security:
+      - ApiKey:
+        - devices.list
+      x-projectIdOptional: true
+      parameters:
+      - in: query
+        name: projectId
+        description: The project ID that the device belongs to. Required for multi-project orgs.
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Property time interval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+components:
+  schemas:
+    DeviceCustomPropertyTimeInterval:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the property time interval.
+        deviceId:
+          type: string
+          description: ID of the associated device.
+        key:
+          type: string
+          description: Key of the property.
+        value:
+          description: Value of the property.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+            uniqueItems: true
+        start:
+          type: string
+          format: date-time
+          description: Inclusive start time this value was in effect.
+        end:
+          type: string
+          format: date-time
+          description: Exclusive end time this value was in effect. When absent the value is still in effect.
+      required:
+      - id
+      - deviceId
+      - key
+      - value
+      - start
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Opaque identifier
+        name:
+          type: string
+          description: Organization-chosen device name
+        projectId:
+          type: string
+          description: The project ID that the device belongs to
+        retainRecordingsSeconds:
+          type: number
+          description: 'The retention period for recordings created on this device. If set to
+
+            zero, recordings are retained indefinitely. This is only relevant for
+
+            devices that have Foxlet installed.
+
+            '
+        properties:
+          $ref: '#/components/schemas/CustomPropertyValues'
+          description: 'A key-value map of the custom properties associated with this device.
+
+            '
+        enabled:
+          type: boolean
+          description: 'Whether this device is enabled. Devices are enabled by default,
+
+            unless they are created with a device token with `preapproved` set to false.
+
+            Disabled devices show up in the device list, but you can''t upload recordings
+
+            for them. A device token linked to a disabled device does not grant access to the API.
+
+            '
+        remoteAccessEnabled:
+          type: boolean
+          description: 'Whether remote access is enabled for this device. When disabled, the device
+
+            cannot establish new remote access sessions.
+
+            '
+        autoDeleteAfterImport:
+          type: boolean
+          description: 'Whether recordings on this device are automatically deleted once they have
+
+            been successfully uploaded and accepted for import. This is only relevant
+
+            for devices that have Foxlet installed.
+
+            '
+      required:
+      - id
+      - name
+      - projectId
+      - enabled
+      - remoteAccessEnabled
+      - autoDeleteAfterImport
+      - agentSupportsAutoDelete
+    DeviceDetails:
+      type: object
+      properties:
+        orgId:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date-time
+    DeviceRemoteAccessState:
+      type: object
+    deviceName:
+      type: string
+      maxLength: 100
+      description: The name of the device.
+      pattern: ^[A-Za-z0-9_.-]+$
+  parameters:
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

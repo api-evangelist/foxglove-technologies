@@ -1,0 +1,362 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Topics API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Topics
+  description: 'Topics provide schema information for messages in the data source.
+
+    '
+paths:
+  /data/topics:
+    get:
+      tags:
+      - Topics
+      summary: List topics
+      description: 'Get a list of topics available for a device within a given time range.
+
+
+        By default, this endpoint will not return the `schema` for each topic. To include
+
+        the schemas, you must provide the `includeSchemas` query parameter.
+
+
+        Use `start` and `end` to limit the response to overlapping recording ranges.
+
+
+        Topics for not-imported recordings are only returned if no parameter is provided besides
+
+        recordingId or recordingKey. This is because most parameters need the imported files to
+
+        filter, and can only return an empty list if imports are unavailable.'
+      security:
+      - ApiKey:
+        - data.topics.list
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\nfrom datetime import datetime, timedelta\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nclient.get_topics(\n    device_id=device_id,\n    start=datetime.now() - timedelta(hours=3),\n    end=datetime.now() - timedelta(hours=1),\n)\n"
+      parameters:
+      - $ref: '#/components/parameters/start'
+        description: 'Return all topics appearing in recordings ending on or after `start`
+
+          '
+      - $ref: '#/components/parameters/end'
+        description: 'Return all topics appearing in recordings starting on or before `end` (updated March 2024 to be `<=` instead of `<`)
+
+          '
+      - in: query
+        name: importId
+        description: ID of the import from which to list topics
+        deprecated: true
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: recordingId
+        description: ID of the recording from which to list topics
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: recordingKey
+        description: Key of the recording from which to list topics
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: deviceId
+        description: ID of device being queried
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: device.name
+        description: Equivalent to deviceName, and ignored if deviceName is supplied
+        schema:
+          type: string
+          minLength: 1
+        required: false
+        deprecated: true
+      - in: query
+        name: deviceName
+        description: Name of device being queried
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: device.id
+        description: Equivalent to deviceId, and ignored if deviceId is supplied
+        schema:
+          type: string
+          minLength: 1
+        required: false
+        deprecated: true
+      - in: query
+        name: sessionId
+        description: ID of a recording session to list topics from
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: sessionKey
+        description: Key of a recording session to list topics from
+        schema:
+          type: string
+          minLength: 1
+        required: false
+      - in: query
+        name: includeSchemas
+        description: Whether full schemas should be included in the response
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: sortBy
+        description: Sort by a single field of the topic type ("topic" or "version")
+        schema:
+          type: string
+          enum:
+          - topic
+          - version
+        required: false
+      - in: query
+        name: projectId
+        description: Filter topics matching project ID
+        schema:
+          type: string
+        required: false
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: List of topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Topic'
+components:
+  parameters:
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    Topic:
+      type: object
+      description: A topic to which messages can be published.
+      properties:
+        encoding:
+          type: string
+          description: Encoding of the topic
+        schema:
+          type: string
+          description: Full schema, base-64 encoded; included only if the request's includeSchemas is true
+        schemaEncoding:
+          type: string
+          description: Encoding of the topic schema
+        schemaName:
+          type: string
+          description: Name of the topic schema
+        topic:
+          type: string
+          description: Topic name
+        version:
+          type: string
+          description: Topic version
+      required:
+      - encoding
+      - schemaEncoding
+      - schemaName
+      - topic
+      - version
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

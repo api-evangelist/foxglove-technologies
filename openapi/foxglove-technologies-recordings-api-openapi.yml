@@ -1,0 +1,966 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Recordings API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Recordings
+  description: 'A recording is a resource representing the content of an MCAP file or ROS bag managed by Data
+
+    Platform.
+
+    '
+paths:
+  /recordings:
+    get:
+      tags:
+      - Recordings
+      summary: List recordings
+      security:
+      - ApiKey:
+        - recordings.list
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: 'from foxglove.client import Client
+
+
+          token = "<YOUR API TOKEN HERE>"
+
+          client = Client(token=token)
+
+
+          client.get_recordings()
+
+          '
+      parameters:
+      - $ref: '#/components/parameters/start'
+        description: 'Start of inclusive time range: return all recordings with data on or after this value
+
+          '
+      - $ref: '#/components/parameters/end'
+        description: 'End of inclusive time range: return all recordings with data on or before this value
+
+          '
+      - in: query
+        name: path
+        description: Filter response to recordings with this path
+        schema:
+          type: string
+      - in: query
+        name: site.id
+        description: Filter response to recordings stored at the Primary Site with this ID
+        schema:
+          type: string
+      - in: query
+        name: edgeSite.id
+        description: Filter response to recordings stored at the Edge Site with this ID
+        schema:
+          type: string
+      - in: query
+        name: deviceId
+        description: Filter response to recordings for the device with this ID, empty string for those without any
+        schema:
+          type: string
+      - in: query
+        name: deviceName
+        description: Filter response to recordings for the device with this name
+        schema:
+          type: string
+      - in: query
+        name: topic
+        description: Filter response to recordings containing the topic
+        schema:
+          type: string
+      - in: query
+        name: device.id
+        description: Equivalent to deviceId, and ignored if deviceId is supplied
+        schema:
+          type: string
+        deprecated: true
+      - in: query
+        name: device.name
+        description: Equivalent to deviceName, and ignored if deviceName is supplied
+        schema:
+          type: string
+        deprecated: true
+      - in: query
+        name: importStatus
+        description: Filter response to recordings with this import status
+        schema:
+          type: string
+          enum:
+          - none
+          - pending
+          - importing
+          - failed
+          - complete
+      - in: query
+        name: projectId
+        description: Filter recordings by project
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sessionId
+        description: Filter response to recordings in the session with this ID, or empty string for recordings with no associated session
+        schema:
+          type: string
+      - in: query
+        name: sessionKey
+        description: Filter response to recordings in the session with this key (sessions group recordings from a specific device)
+        schema:
+          type: string
+      - in: query
+        name: metadataQuery
+        description: 'Filter recordings by metadata using a query syntax.
+
+
+          Supports key-value search variations (see [Recordings Search](https://docs.foxglove.dev/docs/data/recordings#search)):
+
+
+          * `key:value`: matches recordings with metadata that contains a key named `key` with a value of `value`
+
+          * `key:value1,value2`: matches recordings with metadata that contains a key named `key` with a value of either `value1` or `value2`
+
+          * `key:*`: matches recordings where any metadata contains a key named `key`
+
+          * `*:value`: matches recordings where any metadata contains `value` as a value
+
+          * `search term`: matches recordings with metadata where any key or value string contains `search term`
+
+
+          Multiple qualifiers can be used in the same query string; this will filter recordings where metadata matches the intersection of the qualifiers (AND).
+
+
+          **Examples:**
+
+          * `temperature:high` - find recordings with sensor metadata where temperature is high
+
+          * `status:* device:camera1` - find recordings with any status AND device camera1
+
+          * `*:error` - find any key with "error" value
+
+          * `warehouseName:"leaping llama"` - use quotes for values with spaces or special characters
+
+
+          As this is a query parameter, the value must be URL-encoded.
+
+          '
+        schema:
+          type: string
+        required: false
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - in: query
+        name: sortBy
+        description: 'Sort returned recordings by a field in the response type. Specifying `duration` sorts by
+
+          the duration between the recording `start` and `end` fields.
+
+          '
+        schema:
+          type: string
+          enum:
+          - deviceName
+          - device.name
+          - createdAt
+          - start
+          - end
+          - duration
+          - path
+          - importedAt
+      - $ref: '#/components/parameters/sortOrder'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recording'
+  /recordings/{keyOrId}:
+    parameters:
+    - in: path
+      name: keyOrId
+      schema:
+        type: string
+      required: true
+      description: Recording Key or ID
+    get:
+      tags:
+      - Recordings
+      summary: Get a recording
+      description: 'Get details on a specific recording.
+
+        '
+      parameters: []
+      security:
+      - ApiKey:
+        - recordings.list
+      responses:
+        '200':
+          description: A Recording
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+    delete:
+      tags:
+      - Recordings
+      summary: Delete a recording
+      description: 'Deletes a recording. Deleting a recording also deletes the data for that recording
+
+        (including attachments, messages, metadata, etc).
+
+
+        Note: If the recording was imported from an Edge Site, only the imported data is
+
+        removed; the edge copy on the Edge Site is unchanged and the recording can be
+
+        imported again. The recording remains associated with any session it belongs to,
+
+        and re-importing restores it on that session.
+
+        '
+      security:
+      - ApiKey:
+        - recordings.delete
+      responses:
+        '200':
+          description: The deleted recording ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recordingId:
+                    type: string
+                    description: The recording ID
+                required:
+                - recordingId
+  /recordings/{keyOrId}/import:
+    parameters:
+    - in: path
+      name: keyOrId
+      schema:
+        type: string
+      required: true
+      description: Recording ID
+    post:
+      tags:
+      - Recordings
+      summary: Import from edge
+      description: 'Request import of a recording from an Edge Site to a Primary Site. Importing a recording
+
+        makes the data (messages, metadata, attachments, etc.) available for download and streaming.
+
+
+        If the recording is successfully queued for import, is already imported, or already queued for
+
+        import, this endpoint will return a 200 response and include the recording ID and the
+
+        `importStatus`.
+
+
+        An import status of `complete` indicates the recording is already imported. Poll the `GET
+
+        v1/recordings/{id}` endpoint to observe changes to the `importStatus`.
+
+
+        If the recording cannot be found or is unavailable for import because the edge copy or site
+
+        is deleted, this endpoint will return a 404 response.
+
+        '
+      security:
+      - ApiKey:
+        - data.upload
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Recording ID
+                  importStatus:
+                    $ref: '#/components/schemas/RecordingImportStatus'
+  /data/pending-imports:
+    get:
+      tags:
+      - Recordings
+      summary: List pending imports
+      description: 'List the pending imports. These are in-progress import jobs for newly uploaded recordings.
+
+        '
+      security:
+      - ApiKey:
+        - data.imports.pending.list
+      parameters:
+      - in: query
+        name: requestId
+        description: A specific import request ID
+        schema:
+          type: string
+      - in: query
+        name: key
+        description: The unique key optionally provided when importing
+        schema:
+          type: string
+      - in: query
+        name: deviceId
+        description: ID of device associated with the pending import
+        schema:
+          type: string
+      - in: query
+        name: deviceName
+        description: Name of device associated with the pending import
+        schema:
+          type: string
+      - in: query
+        name: device.name
+        description: Equivalent to deviceName, and ignored if deviceName is supplied
+        schema:
+          type: string
+        deprecated: true
+      - in: query
+        name: device.id
+        description: Equivalent to deviceId, and ignored if deviceId is supplied
+        schema:
+          type: string
+        deprecated: true
+      - in: query
+        name: error
+        deprecated: true
+        description: Deprecated. Use `/import-errors` instead.
+        schema:
+          type: string
+      - in: query
+        name: filename
+        description: Filename to exactly match
+        schema:
+          type: string
+      - in: query
+        name: updatedSince
+        description: Filter pending imports updated since this time
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: showCompleted
+        description: Include completed requests
+        schema:
+          type: boolean
+          default: false
+      - in: query
+        name: showQuarantined
+        description: Include quarantined requests
+        schema:
+          type: boolean
+          default: false
+      - in: query
+        name: siteId
+        description: Filter response to imports at site with this ID
+        schema:
+          type: string
+      - in: query
+        name: projectId
+        description: Filter pending imports by project
+        schema:
+          type: string
+      - in: query
+        name: sortBy
+        description: Sort by a single field of the import type
+        schema:
+          type: string
+          enum:
+          - createdAt
+          - deviceId
+          - deviceName
+          - device.name
+          - device.id
+          - error
+          - importId
+          - requestId
+          - updatedAt
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingImport'
+  /data/import-errors:
+    get:
+      tags:
+      - Recordings
+      summary: List import errors
+      description: 'List import errors. These are failed pending imports that have encountered errors during processing.
+
+        '
+      security:
+      - ApiKey:
+        - data.imports.pending.list
+      parameters:
+      - in: query
+        name: deviceName
+        description: Name of device associated with the import error
+        schema:
+          type: string
+      - in: query
+        name: filenameMatches
+        description: Pattern to match against filename
+        schema:
+          type: string
+      - in: query
+        name: error
+        description: A string to filter based on error messages
+        schema:
+          type: string
+      - in: query
+        name: projectId
+        description: Filter import errors by project
+        schema:
+          type: string
+      - in: query
+        name: sortBy
+        description: Sort by a single field
+        schema:
+          type: string
+          enum:
+          - createdAt
+          - deviceName
+          - error
+          - requestId
+          - updatedAt
+      - $ref: '#/components/parameters/sortOrder'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingImport'
+  /data/upload:
+    post:
+      tags:
+      - Recordings
+      summary: Upload a recording
+      description: 'Use this endpoint to upload data to your `foxglove-hosted` site. The upload is a two-request
+
+        process.
+
+
+        1. Make a request to this upload endpoint to create an upload `link`.
+
+        2. Issue a PUT HTTP request to the `link` response field URL.
+
+
+        _Your PUT request header should have `Content-Type: application/octet-stream`, and your
+
+        request body should contain your file content._
+
+
+        Note: If you are using a self-hosted site, see [this
+
+        guide](https://docs.foxglove.dev/docs/primary-sites/self-hosting/manage-data) for uploading data.
+
+
+        #### Size considerations
+
+
+        While we support processing very large files, we generally recommend avoiding large (50GB+)
+
+        files to reduce the chance of upload failures or processing issues. If you have tooling that
+
+        generates very large files, consider splitting them up into smaller chunks.
+
+        '
+      security:
+      - ApiKey:
+        - data.upload
+      x-codeSamples:
+      - lang: python
+        label: Python
+        source: "from foxglove.client import Client\nfrom pathlib import Path\n\ntoken = \"<YOUR API TOKEN HERE>\"\nclient = Client(token=token)\n\nwith Path(\"my_mcap_data.mcap\").open(\"rb\") as byte_stream:\n    client.upload_data(\n        device_id=device_id,\n        filename=\"my_mcap_data.mcap\",\n        data=byte_stream,\n        callback=lambda size, progress: print(size, progress),\n        project_id=\"<YOUR PROJECT ID HERE>\",\n    )\n"
+      requestBody:
+        required: true
+        description: In addition to `filename`, one of `deviceId`, `deviceName`, or `key` is required and `projectId` is recommended.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceId:
+                  type: string
+                  description: Foxglove ID of the associated device
+                deviceName:
+                  type: string
+                  description: Unique name of the associated device. If no device exists with this name, the device will be created.
+                device.name:
+                  type: string
+                  deprecated: true
+                  description: Equivalent to deviceName, and ignored if deviceName is supplied
+                device.id:
+                  type: string
+                  deprecated: true
+                  description: Equivalent to deviceId, and ignored if deviceId is supplied
+                filename:
+                  type: string
+                  description: Name of the file that will be uploaded
+                key:
+                  type: string
+                  minLength: 1
+                  description: A unique key to identify the recording
+                projectId:
+                  type: string
+                  description: The project ID that the recording belongs to. Required for multi-project orgs if an existing device is not provided
+                sessionId:
+                  type: string
+                  description: ID of an existing session to associate the upload with.
+                sessionKey:
+                  type: string
+                  description: Key of a session to associate the upload with. If no session exists with this key, a new session will be created using the provided device.
+              required:
+              - filename
+      responses:
+        '200':
+          description: Upload details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link:
+                    type: string
+                    description: A signed upload URL. Upload your data to this URL using a PUT request.
+                  requestId:
+                    type: string
+                required:
+                - link
+                - requestId
+components:
+  parameters:
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    Recording:
+      type: object
+      description: 'A resource representing the content of an MCAP file or ROS bag managed by Foxglove.
+
+        '
+      properties:
+        id:
+          type: string
+          description: ID of the recording
+        projectId:
+          type: string
+          description: The project ID that the recording belongs to
+        path:
+          type: string
+          description: 'The filepath of the recording as it was originally provided to Foxglove.
+
+            For recordings originated at the edge, this is the full path of the recording file in
+
+            the edge controller store. For recordings uploaded directly to Foxglove, this is
+
+            the `filename` query arg provided to `/data/upload`.
+
+            '
+        size:
+          type: number
+          description: The size of the recording file, in bytes
+          format: bigint
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the recording file was added to Foxglove.
+        importedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the recording was imported to a primary site.
+        start:
+          type: string
+          format: date
+          description: The log time of the first message in the recording.
+        end:
+          type: string
+          format: date
+          description: The log time of the last message in the recording.
+        importStatus:
+          $ref: '#/components/schemas/RecordingImportStatus'
+        site:
+          description: The primary site for this recording.
+          $ref: '#/components/schemas/PrimarySiteSummary'
+        edgeSite:
+          description: The edge site for this recording.
+          $ref: '#/components/schemas/EdgeSiteSummary'
+        device:
+          $ref: '#/components/schemas/DeviceSummary'
+        key:
+          type: string
+          description: 'The unique, user-specified key assigned to a recording in MCAP metadata or during the upload
+
+            process. This can be used to identify the recording, in addition to its `id`.
+
+            '
+        metadata:
+          type: array
+          description: The metadata records of the original MCAP file content
+          items:
+            $ref: '#/components/schemas/RecordingMetadata'
+        sessionId:
+          type: string
+          description: The ID of the session this recording belongs to.
+      required:
+      - id
+      - projectId
+      - path
+      - size
+      - start
+      - end
+      - createdAt
+      - importStatus
+    PrimarySiteSummary:
+      type: object
+      description: 'ID and name of a primary site.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        indexingStrategy:
+          type: string
+          enum:
+          - split-files
+          - index-in-place
+      required:
+      - id
+      - name
+      - indexingStrategy
+    RecordingMetadata:
+      type: object
+      description: 'MCAP metadata pertaining to a recording.
+
+        '
+      properties:
+        name:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - name
+      - metadata
+    RecordingImportStatus:
+      type: string
+      description: 'The import status of recordings. Status will be one of:
+
+        - `none`: The recording has not yet been imported, and import has not been requested.
+
+        - `pending`: Foxglove has received a request to import this recording.
+
+        - `importing`: The recording data is being processed for access via Foxglove.
+
+        - `failed`: The recording data could not be imported.
+
+        - `complete`: The contents of the recording are available for access via Foxglove.
+
+
+        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
+
+
+        The set of `importStatus` values may expand in the future.
+
+        '
+      enum:
+      - none
+      - pending
+      - importing
+      - failed
+      - complete
+    PendingImport:
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: When the pending import was created
+        deviceId:
+          type: string
+          description: ID of device
+        deviceName:
+          type: string
+          description: Name of the device from which the import originated
+        error:
+          type: string
+          description: Error message, if status is "error"
+        filename:
+          type: string
+          description: Filename of the import
+        importId:
+          type: string
+          description: ID of import; undefined until status is "complete"
+        orgId:
+          type: string
+          description: ID of org to which the import belongs
+        pipelineStage:
+          type: string
+          description: stage in the import pipeline the import currently occupies
+        requestId:
+          type: string
+          description: ID of the import request
+        projectId:
+          type: string
+          description: ID of the project to which the import belongs
+        siteId:
+          type: string
+          description: ID of Primary Site where import will be stored
+        status:
+          type: string
+          description: Status of initiated import
+          enum:
+          - received
+          - processing
+          - ready for indexing
+          - error
+          - complete
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the pending import was last updated
+        quarantinedAt:
+          type: string
+          format: date-time
+          description: When the pending import was quarantined
+      required:
+      - createdAt
+      - filename
+      - orgId
+      - pipelineStage
+      - requestId
+      - updatedAt
+      - siteId
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    EdgeSiteSummary:
+      type: object
+      description: 'ID and name of an edge site.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts

@@ -1,0 +1,341 @@
+openapi: 3.2.0
+info:
+  title: Foxglove Event Types API
+  version: v1
+  x-logo:
+    url: https://foxglove.dev/images/logo-icon-round.png
+  description: '# Python client
+
+
+    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
+
+
+    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
+
+    [GitHub](https://github.com/foxglove/foxglove-python).
+
+
+    # Authentication
+
+
+    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
+
+
+
+    Requests must include the API key in the `Authorization` header as a bearer token:
+
+
+    ```
+
+    Authorization: Bearer fox_sk_1234...
+
+    ```
+
+
+    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
+
+    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
+
+    capability.
+
+
+    # Sorting and pagination
+
+
+    Some GET endpoints support sorting and pagination.
+
+
+    Where supported, you will see the following
+
+    query parameters in the endpoint documentation:
+
+
+    * `sortBy` – Field name to sort by (endpoint specific)
+
+    * `sortOrder` – "asc" or "desc"
+
+    * `limit` – Number of records in the response
+
+    * `offset` – Number of records to skip
+
+
+    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
+
+    greater than 2000 items will result in a 400 response.
+
+
+    # Timestamps
+
+
+    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
+
+
+    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
+
+
+    These timestamps support nanosecond resolution with up to nine fractional digits.
+
+
+    Examples:
+
+    - 2023-04-06T09:15:30Z
+
+    - 2023-04-06T18:27:45.876543210Z
+
+
+    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
+
+
+    # Rate limits
+
+
+    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
+
+    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
+
+    request should be retried.
+
+
+    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
+
+    and you may issue retries with a strategy such as exponential backoff.
+
+    '
+servers:
+- url: https://api.foxglove.dev/v1
+  description: Production
+security: []
+tags:
+- name: Event Types
+  description: 'Event types help ensure data quality through validation, enable better filtering and analytics,
+
+    and provide visual distinctions between categories of events.
+
+    '
+paths:
+  /event-types:
+    get:
+      tags:
+      - Event Types
+      summary: List event types
+      security:
+      - ApiKey:
+        - eventTypes.list
+      parameters: []
+      responses:
+        '200':
+          description: A list of event types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - type: object
+    post:
+      tags:
+      - Event Types
+      summary: Create an event type
+      security:
+      - ApiKey:
+        - eventTypes.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the event type
+                  minLength: 1
+                  maxLength: 32
+                colorName:
+                  type: string
+                  description: Color name of the event type, e.g. "red"
+                  minLength: 1
+                  maxLength: 32
+                customProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EventTypeCustomProperty'
+                  description: Ordered array of custom properties associated with the event type
+              required:
+              - name
+              - customProperties
+      responses:
+        '200':
+          description: The created event type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+  /event-types/{id}:
+    parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: ID of the event type
+    get:
+      tags:
+      - Event Types
+      summary: Get an event type
+      security:
+      - ApiKey:
+        - eventTypes.list
+      parameters: []
+      responses:
+        '200':
+          description: The event type
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/EventType'
+                - type: object
+    patch:
+      tags:
+      - Event Types
+      summary: Update an event type
+      security:
+      - ApiKey:
+        - eventTypes.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the event type
+                  minLength: 1
+                  maxLength: 32
+                colorName:
+                  type: string
+                  description: Color name of the event type, e.g. "red"
+                  minLength: 1
+                  maxLength: 32
+                customProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EventTypeCustomProperty'
+                  description: Ordered array of custom properties associated with the event type. This will replace the existing customProperties list.
+              minProperties: 1
+      responses:
+        '200':
+          description: The updated event type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+    delete:
+      tags:
+      - Event Types
+      summary: Delete an event type
+      security:
+      - ApiKey:
+        - eventTypes.delete
+      responses:
+        '200':
+          description: ID of the deleted event type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the deleted event type
+                required:
+                - id
+components:
+  schemas:
+    EventTypeCustomProperty:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the custom property
+        required:
+          type: boolean
+          description: Whether the custom property is required for this event type
+      required:
+      - id
+      - required
+    EventType:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the event type
+        name:
+          type: string
+          description: Name of the event type
+        createdAt:
+          type: string
+          format: date-time
+          description: When the event type was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the event type was last updated
+        colorName:
+          type: string
+          description: Color name of the event type, e.g. "red"
+        customProperties:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventTypeCustomProperty'
+          description: Ordered array of custom properties associated with the event type
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+  securitySchemes:
+    Session:
+      type: apiKey
+      in: cookie
+      name: fox.session
+      description: User permissions when signed into the website
+    ApiKey:
+      type: http
+      scheme: bearer
+      description: API key authentication using HTTP Bearer auth
+    SiteBucketNotificationBearerToken:
+      type: http
+      scheme: bearer
+      description: Site bucket notification authentication using HTTP Bearer auth
+x-tagGroups:
+- name: Data Platform
+  tags:
+  - Coverage
+  - Custom Properties
+  - Device Tokens
+  - Devices
+  - Events
+  - Event Types
+  - Imports
+  - Lake files
+  - Projects
+  - Recording Attachments
+  - Recordings
+  - Sessions
+  - Site Tokens
+  - Site Inbox Notification Tokens
+  - Sites
+  - Stream data
+  - Topics
+- name: Webhooks
+  tags:
+  - Webhook Payloads
+- name: Visualization
+  tags:
+  - Extensions
+  - Layouts
