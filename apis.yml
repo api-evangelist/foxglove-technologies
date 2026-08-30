@@ -193,6 +193,8 @@ apis:
   humanURL: https://docs.foxglove.dev/api
   baseURL: https://api.foxglove.dev/v1
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
@@ -314,6 +316,8 @@ apis:
   humanURL: https://docs.foxglove.dev/api
   baseURL: https://api.foxglove.dev/v1
   tags:
+  - Project
+  tags_raw:
   - Projects
   properties:
   - type: OpenAPI
