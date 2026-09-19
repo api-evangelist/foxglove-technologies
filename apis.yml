@@ -259,6 +259,8 @@ apis:
   humanURL: https://docs.foxglove.dev/api
   baseURL: https://api.foxglove.dev/v1
   tags:
+  - Import
+  tags_raw:
   - Imports
   properties:
   - type: OpenAPI
@@ -409,6 +411,8 @@ apis:
   humanURL: https://docs.foxglove.dev/api
   baseURL: https://api.foxglove.dev/v1
   tags:
+  - Recording
+  tags_raw:
   - Recordings
   properties:
   - type: OpenAPI
@@ -548,6 +552,8 @@ apis:
   humanURL: https://docs.foxglove.dev/api
   baseURL: https://api.foxglove.dev/v1
   tags:
+  - Topic
+  tags_raw:
   - Topics
   properties:
   - type: OpenAPI
