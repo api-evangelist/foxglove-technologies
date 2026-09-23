@@ -7,100 +7,7 @@ info:
   description: '# Python client
 
 
-    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
-
-
-    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
-
-    [GitHub](https://github.com/foxglove/foxglove-python).
-
-
-    # Authentication
-
-
-    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
-
-
-
-    Requests must include the API key in the `Authorization` header as a bearer token:
-
-
-    ```
-
-    Authorization: Bearer fox_sk_1234...
-
-    ```
-
-
-    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
-
-    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
-
-    capability.
-
-
-    # Sorting and pagination
-
-
-    Some GET endpoints support sorting and pagination.
-
-
-    Where supported, you will see the following
-
-    query parameters in the endpoint documentation:
-
-
-    * `sortBy` – Field name to sort by (endpoint specific)
-
-    * `sortOrder` – "asc" or "desc"
-
-    * `limit` – Number of records in the response
-
-    * `offset` – Number of records to skip
-
-
-    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
-
-    greater than 2000 items will result in a 400 response.
-
-
-    # Timestamps
-
-
-    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
-
-
-    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
-
-
-    These timestamps support nanosecond resolution with up to nine fractional digits.
-
-
-    Examples:
-
-    - 2023-04-06T09:15:30Z
-
-    - 2023-04-06T18:27:45.876543210Z
-
-
-    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
-
-
-    # Rate limits
-
-
-    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
-
-    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
-
-    request should be retried.
-
-
-    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
-
-    and you may issue retries with a strategy such as exponential backoff.
-
-    '
+    Foxglove provides a Python client library (`foxglove-client`) to more easily interact with the Foxglove API.'
 servers:
 - url: https://api.foxglove.dev/v1
   description: Production
@@ -115,18 +22,16 @@ tags:
     Devices are referenced by other resources like recordings and events.
 
 
-    A device may have [Foxlet](https://docs.foxglove.dev/docs/fleet/foxlet)
+    A device may have Foxlet
 
     installed on it. In this case, you may configure the retention period for recordings on the
 
     device by setting its `retainRecordingsSeconds`.
 
 
-    To help manage your devices, you may define [custom properties](#tag/Custom-Properties) and
+    To help manage your devices, you may define custom properties and
 
-    assign metadata to each device via its `properties`.
-
-    '
+    assign metadata to each device via its `properties`.'
 paths:
   /devices:
     get:
@@ -156,9 +61,7 @@ paths:
 
         * `foo`: matches devices with properties where any key or stringified value contains `foo`
 
-        Multiple qualifiers can be used in the same query string; this will filter devices matching the intersection of the qualifiers (AND).
-
-        '
+        Multiple qualifiers can be used in the same query string; this will filter devices matching the intersection of the qualifiers (AND).'
       x-codeSamples:
       - lang: python
         label: Python
@@ -206,6 +109,8 @@ paths:
                   - $ref: '#/components/schemas/Device'
                   - $ref: '#/components/schemas/DeviceDetails'
                   - $ref: '#/components/schemas/DeviceRemoteAccessState'
+      operationId: getDevices
+      x-operation-id-source: derived
     post:
       tags:
       - Devices
@@ -248,6 +153,8 @@ paths:
                 allOf:
                 - $ref: '#/components/schemas/Device'
                 - $ref: '#/components/schemas/DeviceDetails'
+      operationId: postDevices
+      x-operation-id-source: derived
   /actions/devices/{nameOrId}/update-property-time-interval:
     parameters:
     - in: path
@@ -272,11 +179,9 @@ paths:
 
         this assertion. This endpoint should only be used for updating past time intervals. To update the
 
-        current value of a property use the [update device](#tag/Devices/paths/~1devices~1%7BnameOrId%7D/patch)
+        current value of a property use the update device
 
-        endpoint.
-
-        '
+        endpoint.'
       security:
       - ApiKey:
         - devices.update
@@ -329,6 +234,8 @@ paths:
       responses:
         '204':
           description: Success
+      operationId: postActionsDevicesByNameOrIdUpdatePropertyTimeInterval
+      x-operation-id-source: derived
   /devices/{nameOrId}:
     parameters:
     - in: path
@@ -347,9 +254,7 @@ paths:
       tags:
       - Devices
       summary: Get a device
-      description: 'Get details on a specific device.
-
-        '
+      description: Get details on a specific device.
       security:
       - ApiKey:
         - devices.list
@@ -374,6 +279,8 @@ paths:
                 allOf:
                 - $ref: '#/components/schemas/Device'
                 - $ref: '#/components/schemas/DeviceRemoteAccessState'
+      operationId: getDevicesByNameOrId
+      x-operation-id-source: derived
     delete:
       tags:
       - Devices
@@ -381,9 +288,7 @@ paths:
       description: 'Delete a device. Once a device is deleted, it will no longer show up in your list of devices.
 
 
-        _Before deleting a device, you must delete all associated data._
-
-        '
+        _Before deleting a device, you must delete all associated data._'
       security:
       - ApiKey:
         - devices.delete
@@ -422,6 +327,8 @@ paths:
                     description: The ID of the deleted device
                 required:
                 - id
+      operationId: deleteDevicesByNameOrId
+      x-operation-id-source: derived
     patch:
       tags:
       - Devices
@@ -506,6 +413,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+      operationId: patchDevicesByNameOrId
+      x-operation-id-source: derived
   /devices/{nameOrId}/property-time-intervals:
     parameters:
     - in: path
@@ -541,9 +450,7 @@ paths:
 
         * `foo`: matches rows where any key or stringified value contains `foo`
 
-        Multiple qualifiers can be used in the same query string; this will filter rows matching the intersection of the qualifiers (AND).
-
-        '
+        Multiple qualifiers can be used in the same query string; this will filter rows matching the intersection of the qualifiers (AND).'
       security:
       - ApiKey:
         - devices.list
@@ -598,6 +505,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+      operationId: getDevicesByNameOrIdPropertyTimeIntervals
+      x-operation-id-source: derived
   /devices/{nameOrId}/property-time-intervals/{id}:
     parameters:
     - in: path
@@ -624,9 +533,7 @@ paths:
       tags:
       - Devices
       summary: Get a device property time interval
-      description: 'Returns a specific device property time interval for a device.
-
-        '
+      description: Returns a specific device property time interval for a device.
       security:
       - ApiKey:
         - devices.list
@@ -645,55 +552,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+      operationId: getDevicesByNameOrIdPropertyTimeIntervalsById
+      x-operation-id-source: derived
 components:
   schemas:
-    DeviceCustomPropertyTimeInterval:
+    deviceName:
+      type: string
+      maxLength: 100
+      description: The name of the device.
+      pattern: ^[A-Za-z0-9_.-]+$
+    DeviceDetails:
       type: object
       properties:
-        id:
+        orgId:
           type: string
-          description: ID of the property time interval.
-        deviceId:
+        createdAt:
           type: string
-          description: ID of the associated device.
-        key:
-          type: string
-          description: Key of the property.
-        value:
-          description: Value of the property.
-          oneOf:
-          - type: string
-          - type: number
-          - type: boolean
-          - type: array
-            items:
-              type: string
-            uniqueItems: true
-        start:
+          format: date
+        updatedAt:
           type: string
           format: date-time
-          description: Inclusive start time this value was in effect.
-        end:
-          type: string
-          format: date-time
-          description: Exclusive end time this value was in effect. When absent the value is still in effect.
-      required:
-      - id
-      - deviceId
-      - key
-      - value
-      - start
-    CustomPropertyValues:
+    DeviceRemoteAccessState:
       type: object
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: array
-          items:
-            type: string
-          uniqueItems: true
     Device:
       type: object
       properties:
@@ -755,42 +635,54 @@ components:
       - remoteAccessEnabled
       - autoDeleteAfterImport
       - agentSupportsAutoDelete
-    DeviceDetails:
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
+    DeviceCustomPropertyTimeInterval:
       type: object
       properties:
-        orgId:
+        id:
           type: string
-        createdAt:
+          description: ID of the property time interval.
+        deviceId:
           type: string
-          format: date
-        updatedAt:
+          description: ID of the associated device.
+        key:
+          type: string
+          description: Key of the property.
+        value:
+          description: Value of the property.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+            uniqueItems: true
+        start:
           type: string
           format: date-time
-    DeviceRemoteAccessState:
-      type: object
-    deviceName:
-      type: string
-      maxLength: 100
-      description: The name of the device.
-      pattern: ^[A-Za-z0-9_.-]+$
+          description: Inclusive start time this value was in effect.
+        end:
+          type: string
+          format: date-time
+          description: Exclusive end time this value was in effect. When absent the value is still in effect.
+      required:
+      - id
+      - deviceId
+      - key
+      - value
+      - start
   parameters:
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
     sortOrder:
       in: query
       name: sortOrder
@@ -800,6 +692,23 @@ components:
         enum:
         - asc
         - desc
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   securitySchemes:
     Session:
       type: apiKey

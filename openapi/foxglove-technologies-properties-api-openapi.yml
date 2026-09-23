@@ -7,100 +7,7 @@ info:
   description: '# Python client
 
 
-    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
-
-
-    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
-
-    [GitHub](https://github.com/foxglove/foxglove-python).
-
-
-    # Authentication
-
-
-    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
-
-
-
-    Requests must include the API key in the `Authorization` header as a bearer token:
-
-
-    ```
-
-    Authorization: Bearer fox_sk_1234...
-
-    ```
-
-
-    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
-
-    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
-
-    capability.
-
-
-    # Sorting and pagination
-
-
-    Some GET endpoints support sorting and pagination.
-
-
-    Where supported, you will see the following
-
-    query parameters in the endpoint documentation:
-
-
-    * `sortBy` – Field name to sort by (endpoint specific)
-
-    * `sortOrder` – "asc" or "desc"
-
-    * `limit` – Number of records in the response
-
-    * `offset` – Number of records to skip
-
-
-    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
-
-    greater than 2000 items will result in a 400 response.
-
-
-    # Timestamps
-
-
-    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
-
-
-    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
-
-
-    These timestamps support nanosecond resolution with up to nine fractional digits.
-
-
-    Examples:
-
-    - 2023-04-06T09:15:30Z
-
-    - 2023-04-06T18:27:45.876543210Z
-
-
-    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
-
-
-    # Rate limits
-
-
-    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
-
-    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
-
-    request should be retried.
-
-
-    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
-
-    and you may issue retries with a strategy such as exponential backoff.
-
-    '
+    Foxglove provides a Python client library (`foxglove-client`) to more easily interact with the Foxglove API.'
 servers:
 - url: https://api.foxglove.dev/v1
   description: Production
@@ -132,11 +39,9 @@ paths:
 
         this assertion. This endpoint should only be used for updating past time intervals. To update the
 
-        current value of a property use the [update device](#tag/Devices/paths/~1devices~1%7BnameOrId%7D/patch)
+        current value of a property use the update device
 
-        endpoint.
-
-        '
+        endpoint.'
       security:
       - ApiKey:
         - devices.update
@@ -189,6 +94,8 @@ paths:
       responses:
         '204':
           description: Success
+      operationId: postActionsDevicesByNameOrIdUpdatePropertyTimeInterval
+      x-operation-id-source: derived
   /devices/{nameOrId}/property-time-intervals:
     parameters:
     - in: path
@@ -224,9 +131,7 @@ paths:
 
         * `foo`: matches rows where any key or stringified value contains `foo`
 
-        Multiple qualifiers can be used in the same query string; this will filter rows matching the intersection of the qualifiers (AND).
-
-        '
+        Multiple qualifiers can be used in the same query string; this will filter rows matching the intersection of the qualifiers (AND).'
       security:
       - ApiKey:
         - devices.list
@@ -281,6 +186,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+      operationId: getDevicesByNameOrIdPropertyTimeIntervals
+      x-operation-id-source: derived
   /devices/{nameOrId}/property-time-intervals/{id}:
     parameters:
     - in: path
@@ -307,9 +214,7 @@ paths:
       tags:
       - Properties
       summary: Get a device property time interval
-      description: 'Returns a specific device property time interval for a device.
-
-        '
+      description: Returns a specific device property time interval for a device.
       security:
       - ApiKey:
         - devices.list
@@ -328,7 +233,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceCustomPropertyTimeInterval'
+      operationId: getDevicesByNameOrIdPropertyTimeIntervalsById
+      x-operation-id-source: derived
 components:
+  parameters:
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
   schemas:
     DeviceCustomPropertyTimeInterval:
       type: object
@@ -366,33 +300,6 @@ components:
       - key
       - value
       - start
-  parameters:
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
   securitySchemes:
     Session:
       type: apiKey

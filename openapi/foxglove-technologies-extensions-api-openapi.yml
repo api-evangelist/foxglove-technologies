@@ -7,100 +7,7 @@ info:
   description: '# Python client
 
 
-    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
-
-
-    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
-
-    [GitHub](https://github.com/foxglove/foxglove-python).
-
-
-    # Authentication
-
-
-    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
-
-
-
-    Requests must include the API key in the `Authorization` header as a bearer token:
-
-
-    ```
-
-    Authorization: Bearer fox_sk_1234...
-
-    ```
-
-
-    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
-
-    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
-
-    capability.
-
-
-    # Sorting and pagination
-
-
-    Some GET endpoints support sorting and pagination.
-
-
-    Where supported, you will see the following
-
-    query parameters in the endpoint documentation:
-
-
-    * `sortBy` – Field name to sort by (endpoint specific)
-
-    * `sortOrder` – "asc" or "desc"
-
-    * `limit` – Number of records in the response
-
-    * `offset` – Number of records to skip
-
-
-    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
-
-    greater than 2000 items will result in a 400 response.
-
-
-    # Timestamps
-
-
-    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
-
-
-    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
-
-
-    These timestamps support nanosecond resolution with up to nine fractional digits.
-
-
-    Examples:
-
-    - 2023-04-06T09:15:30Z
-
-    - 2023-04-06T18:27:45.876543210Z
-
-
-    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
-
-
-    # Rate limits
-
-
-    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
-
-    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
-
-    request should be retried.
-
-
-    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
-
-    and you may issue retries with a strategy such as exponential backoff.
-
-    '
+    Foxglove provides a Python client library (`foxglove-client`) to more easily interact with the Foxglove API.'
 servers:
 - url: https://api.foxglove.dev/v1
   description: Production
@@ -116,19 +23,19 @@ paths:
       description: '**Available on Free, Pro, and Enterprise plans**
 
 
-        Publish a new [Foxglove extension](https://docs.foxglove.dev/docs/extensions)
+        Publish a new Foxglove extension
 
         or an updated version of an existing extension. When uploaded, the extension will automatically be
 
         installed for users in your organization.
 
 
-        See our packaging tool [`create-foxglove-extension`](https://github.com/foxglove/create-foxglove-extension/)
+        See our packaging tool `create-foxglove-extension`
 
         for more information on how to create an extension.
 
 
-        Read the [docs](https://docs.foxglove.dev/docs/extensions)
+        Read the docs
 
         for more information on Foxglove extensions.'
       requestBody:
@@ -188,6 +95,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      operationId: postExtensionUpload
+      x-operation-id-source: derived
   /extensions:
     get:
       tags:
@@ -195,7 +104,7 @@ paths:
       summary: List extensions
       description: 'Organization admins can share and manage Foxglove extensions. Check out the
 
-        [docs](https://docs.foxglove.dev/docs/extensions) to learn more.'
+        docs to learn more.'
       security:
       - ApiKey:
         - extensions.list
@@ -208,6 +117,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Extension'
+      operationId: getExtensions
+      x-operation-id-source: derived
   /extensions/{id}:
     parameters:
     - in: path
@@ -230,13 +141,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExtensionWithSignedLink'
+      operationId: getExtensionsById
+      x-operation-id-source: derived
     delete:
       tags:
       - Extensions
       summary: Delete an extension
-      description: 'Once deleted, the extension will no longer be available within your organization.
-
-        '
+      description: Once deleted, the extension will no longer be available within your organization.
       security:
       - ApiKey:
         - extensions.delete
@@ -253,6 +164,8 @@ paths:
                     description: The ID of the deleted extension
                 required:
                 - id
+      operationId: deleteExtensionsById
+      x-operation-id-source: derived
 components:
   schemas:
     ExtensionWithSignedLink:
@@ -265,13 +178,6 @@ components:
             description: Signed download link for the extension
         required:
         - foxe
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-      - error
     Extension:
       type: object
       properties:
@@ -307,6 +213,13 @@ components:
       - description
       - activeVersion
       - sha256Sum
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
   securitySchemes:
     Session:
       type: apiKey

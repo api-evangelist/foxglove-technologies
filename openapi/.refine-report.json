@@ -1,0 +1,62 @@
+{
+  "provider": "foxglove-technologies",
+  "sources": [
+    "_original/foxglove-technologies-openapi-original.yml"
+  ],
+  "outputs": [
+    "foxglove-technologies-coverage-api-openapi.yml",
+    "foxglove-technologies-custom-properties-api-openapi.yml",
+    "foxglove-technologies-device-tokens-api-openapi.yml",
+    "foxglove-technologies-devices-api-openapi.yml",
+    "foxglove-technologies-event-types-api-openapi.yml",
+    "foxglove-technologies-events-api-openapi.yml",
+    "foxglove-technologies-extensions-api-openapi.yml",
+    "foxglove-technologies-imports-api-openapi.yml",
+    "foxglove-technologies-lake-files-api-openapi.yml",
+    "foxglove-technologies-layouts-api-openapi.yml",
+    "foxglove-technologies-projects-api-openapi.yml",
+    "foxglove-technologies-properties-api-openapi.yml",
+    "foxglove-technologies-recording-attachments-api-openapi.yml",
+    "foxglove-technologies-recordings-api-openapi.yml",
+    "foxglove-technologies-sessions-api-openapi.yml",
+    "foxglove-technologies-site-inbox-notification-tokens-api-openapi.yml",
+    "foxglove-technologies-site-tokens-api-openapi.yml",
+    "foxglove-technologies-sites-api-openapi.yml",
+    "foxglove-technologies-stream-data-api-openapi.yml",
+    "foxglove-technologies-topics-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "foxglove-technologies-openapi-original.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "foxglove-technologies-openapi-original.yml: declared missing tag: Extensions",
+    "foxglove-technologies-openapi-original.yml: declared missing tag: Layouts",
+    "foxglove-technologies-openapi-original.yml: declared missing tag: Properties",
+    "foxglove-technologies-openapi-original.yml: declared missing tag: Stream data",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "foxglove-technologies-coverage-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-custom-properties-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-device-tokens-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-devices-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-event-types-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-events-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-extensions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-imports-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-lake-files-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-layouts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-projects-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-properties-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-recording-attachments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-recordings-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-sessions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-site-inbox-notification-tokens-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-site-tokens-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-sites-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-stream-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "foxglove-technologies-topics-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

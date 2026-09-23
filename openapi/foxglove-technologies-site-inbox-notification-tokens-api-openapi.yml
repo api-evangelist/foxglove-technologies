@@ -7,109 +7,14 @@ info:
   description: '# Python client
 
 
-    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
-
-
-    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
-
-    [GitHub](https://github.com/foxglove/foxglove-python).
-
-
-    # Authentication
-
-
-    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
-
-
-
-    Requests must include the API key in the `Authorization` header as a bearer token:
-
-
-    ```
-
-    Authorization: Bearer fox_sk_1234...
-
-    ```
-
-
-    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
-
-    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
-
-    capability.
-
-
-    # Sorting and pagination
-
-
-    Some GET endpoints support sorting and pagination.
-
-
-    Where supported, you will see the following
-
-    query parameters in the endpoint documentation:
-
-
-    * `sortBy` – Field name to sort by (endpoint specific)
-
-    * `sortOrder` – "asc" or "desc"
-
-    * `limit` – Number of records in the response
-
-    * `offset` – Number of records to skip
-
-
-    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
-
-    greater than 2000 items will result in a 400 response.
-
-
-    # Timestamps
-
-
-    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
-
-
-    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
-
-
-    These timestamps support nanosecond resolution with up to nine fractional digits.
-
-
-    Examples:
-
-    - 2023-04-06T09:15:30Z
-
-    - 2023-04-06T18:27:45.876543210Z
-
-
-    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
-
-
-    # Rate limits
-
-
-    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
-
-    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
-
-    request should be retried.
-
-
-    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
-
-    and you may issue retries with a strategy such as exponential backoff.
-
-    '
+    Foxglove provides a Python client library (`foxglove-client`) to more easily interact with the Foxglove API.'
 servers:
 - url: https://api.foxglove.dev/v1
   description: Production
 security: []
 tags:
 - name: Site Inbox Notification Tokens
-  description: 'Site inbox notification tokens are credentials used to authenticate bucket notifications for a [Primary Site](https://docs.foxglove.dev/docs/primary-sites) (self-managed or BYOS) to the Foxglove API.
-
-    '
+  description: Site inbox notification tokens are credentials used to authenticate bucket notifications for a Primary Site (self-managed or BYOS) to the Foxglove API.
 paths:
   /site-inbox-notification-tokens:
     get:
@@ -135,6 +40,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InboxNotificationToken'
+      operationId: getSiteInboxNotificationTokens
+      x-operation-id-source: derived
     post:
       tags:
       - Site Inbox Notification Tokens
@@ -142,13 +49,11 @@ paths:
       description: 'Create a token that authenticates bucket notifications for a Primary Site in your org (self-managed or BYOS).
 
 
-        See the [Primary Site
+        See the Primary Site
 
-        Installation](https://docs.foxglove.dev/docs/data/primary-sites/installation#bucket-push-notifications)
+        Installation
 
-        documentation for more details.
-
-        '
+        documentation for more details.'
       security:
       - ApiKey:
         - sites.create
@@ -177,6 +82,8 @@ paths:
                     token:
                       type: string
                       description: Generated token. This is only available on creation.
+      operationId: postSiteInboxNotificationTokens
+      x-operation-id-source: derived
   /site-inbox-notification-tokens/{id}:
     parameters:
     - in: path
@@ -205,6 +112,8 @@ paths:
                     description: ID of the deleted inbox notification token
                 required:
                 - id
+      operationId: deleteSiteInboxNotificationTokensById
+      x-operation-id-source: derived
 components:
   schemas:
     InboxNotificationToken:

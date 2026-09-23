@@ -7,100 +7,7 @@ info:
   description: '# Python client
 
 
-    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
-
-
-    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
-
-    [GitHub](https://github.com/foxglove/foxglove-python).
-
-
-    # Authentication
-
-
-    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
-
-
-
-    Requests must include the API key in the `Authorization` header as a bearer token:
-
-
-    ```
-
-    Authorization: Bearer fox_sk_1234...
-
-    ```
-
-
-    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
-
-    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
-
-    capability.
-
-
-    # Sorting and pagination
-
-
-    Some GET endpoints support sorting and pagination.
-
-
-    Where supported, you will see the following
-
-    query parameters in the endpoint documentation:
-
-
-    * `sortBy` – Field name to sort by (endpoint specific)
-
-    * `sortOrder` – "asc" or "desc"
-
-    * `limit` – Number of records in the response
-
-    * `offset` – Number of records to skip
-
-
-    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
-
-    greater than 2000 items will result in a 400 response.
-
-
-    # Timestamps
-
-
-    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
-
-
-    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
-
-
-    These timestamps support nanosecond resolution with up to nine fractional digits.
-
-
-    Examples:
-
-    - 2023-04-06T09:15:30Z
-
-    - 2023-04-06T18:27:45.876543210Z
-
-
-    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
-
-
-    # Rate limits
-
-
-    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
-
-    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
-
-    request should be retried.
-
-
-    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
-
-    and you may issue retries with a strategy such as exponential backoff.
-
-    '
+    Foxglove provides a Python client library (`foxglove-client`) to more easily interact with the Foxglove API.'
 servers:
 - url: https://api.foxglove.dev/v1
   description: Production
@@ -109,9 +16,7 @@ tags:
 - name: Recordings
   description: 'A recording is a resource representing the content of an MCAP file or ROS bag managed by Data
 
-    Platform.
-
-    '
+    Platform.'
 paths:
   /recordings:
     get:
@@ -282,6 +187,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recording'
+      operationId: getRecordings
+      x-operation-id-source: derived
   /recordings/{keyOrId}:
     parameters:
     - in: path
@@ -294,9 +201,7 @@ paths:
       tags:
       - Recordings
       summary: Get a recording
-      description: 'Get details on a specific recording.
-
-        '
+      description: Get details on a specific recording.
       parameters: []
       security:
       - ApiKey:
@@ -308,6 +213,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Recording'
+      operationId: getRecordingsByKeyOrId
+      x-operation-id-source: derived
     delete:
       tags:
       - Recordings
@@ -323,9 +230,7 @@ paths:
 
         imported again. The recording remains associated with any session it belongs to,
 
-        and re-importing restores it on that session.
-
-        '
+        and re-importing restores it on that session.'
       security:
       - ApiKey:
         - recordings.delete
@@ -342,6 +247,8 @@ paths:
                     description: The recording ID
                 required:
                 - recordingId
+      operationId: deleteRecordingsByKeyOrId
+      x-operation-id-source: derived
   /recordings/{keyOrId}/import:
     parameters:
     - in: path
@@ -373,9 +280,7 @@ paths:
 
         If the recording cannot be found or is unavailable for import because the edge copy or site
 
-        is deleted, this endpoint will return a 404 response.
-
-        '
+        is deleted, this endpoint will return a 404 response.'
       security:
       - ApiKey:
         - data.upload
@@ -392,14 +297,14 @@ paths:
                     description: Recording ID
                   importStatus:
                     $ref: '#/components/schemas/RecordingImportStatus'
+      operationId: postRecordingsByKeyOrIdImport
+      x-operation-id-source: derived
   /data/pending-imports:
     get:
       tags:
       - Recordings
       summary: List pending imports
-      description: 'List the pending imports. These are in-progress import jobs for newly uploaded recordings.
-
-        '
+      description: List the pending imports. These are in-progress import jobs for newly uploaded recordings.
       security:
       - ApiKey:
         - data.imports.pending.list
@@ -502,14 +407,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PendingImport'
+      operationId: getDataPendingImports
+      x-operation-id-source: derived
   /data/import-errors:
     get:
       tags:
       - Recordings
       summary: List import errors
-      description: 'List import errors. These are failed pending imports that have encountered errors during processing.
-
-        '
+      description: List import errors. These are failed pending imports that have encountered errors during processing.
       security:
       - ApiKey:
         - data.imports.pending.list
@@ -557,6 +462,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PendingImport'
+      operationId: getDataImportErrors
+      x-operation-id-source: derived
   /data/upload:
     post:
       tags:
@@ -577,9 +484,9 @@ paths:
         request body should contain your file content._
 
 
-        Note: If you are using a self-hosted site, see [this
+        Note: If you are using a self-hosted site, see this
 
-        guide](https://docs.foxglove.dev/docs/primary-sites/self-hosting/manage-data) for uploading data.
+        guide for uploading data.
 
 
         #### Size considerations
@@ -589,9 +496,7 @@ paths:
 
         files to reduce the chance of upload failures or processing issues. If you have tooling that
 
-        generates very large files, consider splitting them up into smaller chunks.
-
-        '
+        generates very large files, consider splitting them up into smaller chunks.'
       security:
       - ApiKey:
         - data.upload
@@ -655,49 +560,143 @@ paths:
                 required:
                 - link
                 - requestId
+      operationId: postDataUpload
+      x-operation-id-source: derived
 components:
-  parameters:
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
   schemas:
+    RecordingImportStatus:
+      type: string
+      description: 'The import status of recordings. Status will be one of:
+
+        - `none`: The recording has not yet been imported, and import has not been requested.
+
+        - `pending`: Foxglove has received a request to import this recording.
+
+        - `importing`: The recording data is being processed for access via Foxglove.
+
+        - `failed`: The recording data could not be imported.
+
+        - `complete`: The contents of the recording are available for access via Foxglove.
+
+
+        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
+
+
+        The set of `importStatus` values may expand in the future.
+
+        '
+      enum:
+      - none
+      - pending
+      - importing
+      - failed
+      - complete
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PendingImport:
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: When the pending import was created
+        deviceId:
+          type: string
+          description: ID of device
+        deviceName:
+          type: string
+          description: Name of the device from which the import originated
+        error:
+          type: string
+          description: Error message, if status is "error"
+        filename:
+          type: string
+          description: Filename of the import
+        importId:
+          type: string
+          description: ID of import; undefined until status is "complete"
+        orgId:
+          type: string
+          description: ID of org to which the import belongs
+        pipelineStage:
+          type: string
+          description: stage in the import pipeline the import currently occupies
+        requestId:
+          type: string
+          description: ID of the import request
+        projectId:
+          type: string
+          description: ID of the project to which the import belongs
+        siteId:
+          type: string
+          description: ID of Primary Site where import will be stored
+        status:
+          type: string
+          description: Status of initiated import
+          enum:
+          - received
+          - processing
+          - ready for indexing
+          - error
+          - complete
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the pending import was last updated
+        quarantinedAt:
+          type: string
+          format: date-time
+          description: When the pending import was quarantined
+      required:
+      - createdAt
+      - filename
+      - orgId
+      - pipelineStage
+      - requestId
+      - updatedAt
+      - siteId
+    PrimarySiteSummary:
+      type: object
+      description: 'ID and name of a primary site.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        indexingStrategy:
+          type: string
+          enum:
+          - split-files
+          - index-in-place
+      required:
+      - id
+      - name
+      - indexingStrategy
+    EdgeSiteSummary:
+      type: object
+      description: 'ID and name of an edge site.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
     Recording:
       type: object
       description: 'A resource representing the content of an MCAP file or ROS bag managed by Foxglove.
@@ -775,25 +774,6 @@ components:
       - end
       - createdAt
       - importStatus
-    PrimarySiteSummary:
-      type: object
-      description: 'ID and name of a primary site.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        indexingStrategy:
-          type: string
-          enum:
-          - split-files
-          - index-in-place
-      required:
-      - id
-      - name
-      - indexingStrategy
     RecordingMetadata:
       type: object
       description: 'MCAP metadata pertaining to a recording.
@@ -809,120 +789,47 @@ components:
       required:
       - name
       - metadata
-    RecordingImportStatus:
-      type: string
-      description: 'The import status of recordings. Status will be one of:
-
-        - `none`: The recording has not yet been imported, and import has not been requested.
-
-        - `pending`: Foxglove has received a request to import this recording.
-
-        - `importing`: The recording data is being processed for access via Foxglove.
-
-        - `failed`: The recording data could not be imported.
-
-        - `complete`: The contents of the recording are available for access via Foxglove.
-
-
-        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
-
-
-        The set of `importStatus` values may expand in the future.
-
-        '
-      enum:
-      - none
-      - pending
-      - importing
-      - failed
-      - complete
-    PendingImport:
-      properties:
-        createdAt:
-          type: string
-          format: date-time
-          description: When the pending import was created
-        deviceId:
-          type: string
-          description: ID of device
-        deviceName:
-          type: string
-          description: Name of the device from which the import originated
-        error:
-          type: string
-          description: Error message, if status is "error"
-        filename:
-          type: string
-          description: Filename of the import
-        importId:
-          type: string
-          description: ID of import; undefined until status is "complete"
-        orgId:
-          type: string
-          description: ID of org to which the import belongs
-        pipelineStage:
-          type: string
-          description: stage in the import pipeline the import currently occupies
-        requestId:
-          type: string
-          description: ID of the import request
-        projectId:
-          type: string
-          description: ID of the project to which the import belongs
-        siteId:
-          type: string
-          description: ID of Primary Site where import will be stored
-        status:
-          type: string
-          description: Status of initiated import
-          enum:
-          - received
-          - processing
-          - ready for indexing
-          - error
-          - complete
-        updatedAt:
-          type: string
-          format: date-time
-          description: When the pending import was last updated
-        quarantinedAt:
-          type: string
-          format: date-time
-          description: When the pending import was quarantined
-      required:
-      - createdAt
-      - filename
-      - orgId
-      - pipelineStage
-      - requestId
-      - updatedAt
-      - siteId
-    DeviceSummary:
-      type: object
-      description: 'ID and name of a device.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-    EdgeSiteSummary:
-      type: object
-      description: 'ID and name of an edge site.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
+  parameters:
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   securitySchemes:
     Session:
       type: apiKey

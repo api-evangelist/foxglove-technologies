@@ -7,118 +7,21 @@ info:
   description: '# Python client
 
 
-    Foxglove provides a Python client library ([`foxglove-client`](https://github.com/foxglove/foxglove-python)) to more easily interact with the Foxglove API.
-
-
-    The SDK can be downloaded from [PyPI](https://pypi.org/project/foxglove-client/) and source is available on
-
-    [GitHub](https://github.com/foxglove/foxglove-python).
-
-
-    # Authentication
-
-
-    All routes excluding the [Site Bucket Notifications endpoint](#tag/Sites/paths/~1site-bucket-notifications/post) require an [API key](/docs/settings#api-keys) with specific capabilities. Only organization admins can create an API key.
-
-
-
-    Requests must include the API key in the `Authorization` header as a bearer token:
-
-
-    ```
-
-    Authorization: Bearer fox_sk_1234...
-
-    ```
-
-
-    Each endpoint in the API reference lists the capabilities required for access. An endpoint with
-
-    Authorizations `ApiKey (devices.list)` would require an api key with the `devices.list`
-
-    capability.
-
-
-    # Sorting and pagination
-
-
-    Some GET endpoints support sorting and pagination.
-
-
-    Where supported, you will see the following
-
-    query parameters in the endpoint documentation:
-
-
-    * `sortBy` – Field name to sort by (endpoint specific)
-
-    * `sortOrder` – "asc" or "desc"
-
-    * `limit` – Number of records in the response
-
-    * `offset` – Number of records to skip
-
-
-    If no limit is provided, endpoints will default to a limit of 2000 items. Requesting a limit
-
-    greater than 2000 items will result in a 400 response.
-
-
-    # Timestamps
-
-
-    Unless otherwise documented, all timestamp related fields (start, end, created, etc) use the ISO8601 conforming [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) UTC "Zulu" format.
-
-
-    In the documentation this will appear as `string` types with `<date-time>` formatting (i.e. `string <date-time>`).
-
-
-    These timestamps support nanosecond resolution with up to nine fractional digits.
-
-
-    Examples:
-
-    - 2023-04-06T09:15:30Z
-
-    - 2023-04-06T18:27:45.876543210Z
-
-
-    > Note: Variants of RFC3339 using durations or offsets which are not conforming to ISO8601 are not supported.
-
-
-    # Rate limits
-
-
-    To help ensure responsiveness for all clients, requests to the API may be rate-limited. In this case, a request
-
-    will receive a status code of 429. Your client may refer to headers, such as "Retry-After", to determine when a
-
-    request should be retried.
-
-
-    In general, if your client experiences an error, you should adjust the rate at which your client makes requests,
-
-    and you may issue retries with a strategy such as exponential backoff.
-
-    '
+    Foxglove provides a Python client library (`foxglove-client`) to more easily interact with the Foxglove API.'
 servers:
 - url: https://api.foxglove.dev/v1
   description: Production
 security: []
 tags:
 - name: Sites
-  description: 'A site is a logical grouping of storage and compute for storing Recording data.
-
-    '
+  description: A site is a logical grouping of storage and compute for storing Recording data.
 paths:
   /sites:
     get:
       tags:
       - Sites
       summary: List sites
-      description: 'Retrieve a list of sites.
-
-        '
+      description: Retrieve a list of sites.
       security:
       - ApiKey:
         - sites.list
@@ -131,13 +34,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Site'
+      operationId: getSites
+      x-operation-id-source: derived
     post:
       tags:
       - Sites
       summary: Create a Site
-      description: 'Create a new site.
-
-        '
+      description: Create a new site.
       security:
       - ApiKey:
         - sites.create
@@ -179,6 +82,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Site'
+      operationId: postSites
+      x-operation-id-source: derived
   /sites/{id}:
     parameters:
     - in: path
@@ -194,9 +99,7 @@ paths:
       security:
       - ApiKey:
         - sites.list
-      description: 'Get details for a specific site.
-
-        '
+      description: Get details for a specific site.
       responses:
         '200':
           description: Site
@@ -204,13 +107,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Site'
+      operationId: getSitesById
+      x-operation-id-source: derived
     patch:
       tags:
       - Sites
       summary: Update site details
-      description: 'Update the name or retention period for a Site.
-
-        '
+      description: Update the name or retention period for a Site.
       security:
       - ApiKey:
         - sites.update
@@ -249,6 +152,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Site'
+      operationId: patchSitesById
+      x-operation-id-source: derived
     delete:
       tags:
       - Sites
@@ -274,9 +179,7 @@ paths:
         affected by this action, and should be cleaned up separately after deleting the site.
 
 
-        If the site type is `edge`, any files in edge storage will not be affected by this action.
-
-        '
+        If the site type is `edge`, any files in edge storage will not be affected by this action.'
       responses:
         '200':
           description: Success
@@ -290,14 +193,16 @@ paths:
                     description: ID of the deleted site
                 required:
                 - id
+      operationId: deleteSitesById
+      x-operation-id-source: derived
   /site-bucket-notifications:
     post:
       tags:
       - Sites
       summary: Notify new recording
-      description: 'Notify your primary site of a new recording to ingest. Most users should set up [Bucket
+      description: 'Notify your primary site of a new recording to ingest. Most users should set up Bucket
 
-        notifications](/docs/data/primary-sites/installation#bucket-push-notification)
+        notifications
 
         instead.
 
@@ -309,9 +214,7 @@ paths:
 
         Authorization: Bearer fox_snt_1234...
 
-        ```
-
-        '
+        ```'
       security:
       - SiteBucketNotificationBearerToken: []
       requestBody:
@@ -392,16 +295,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericSuccess'
+      operationId: postSiteBucketNotifications
+      x-operation-id-source: derived
 components:
   schemas:
-    GenericSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          const: true
-      required:
-      - success
     Site:
       type: object
       properties:
@@ -446,6 +343,14 @@ components:
       - id
       - name
       - type
+    GenericSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+      required:
+      - success
   securitySchemes:
     Session:
       type: apiKey
