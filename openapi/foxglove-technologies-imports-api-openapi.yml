@@ -199,6 +199,14 @@ paths:
       x-operation-id-source: derived
 components:
   parameters:
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
     sortOrder:
       in: query
       name: sortOrder
@@ -208,15 +216,6 @@ components:
         enum:
         - asc
         - desc
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
     end:
       in: query
       name: end
@@ -231,14 +230,15 @@ components:
       schema:
         type: string
         format: date-time
-    offset:
+    limit:
       in: query
-      name: offset
-      description: Number of items to skip before returning the results
+      name: limit
+      description: Maximum number of items to return
       schema:
-        type: integer
+        type: number
         minimum: 0
-        default: 0
+        maximum: 2000
+        default: 2000
   schemas:
     Import:
       type: object

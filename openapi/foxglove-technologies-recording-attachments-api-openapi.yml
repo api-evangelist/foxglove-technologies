@@ -173,15 +173,6 @@ paths:
       x-operation-id-source: derived
 components:
   parameters:
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
     offset:
       in: query
       name: offset
@@ -199,6 +190,15 @@ components:
         minimum: 0
         maximum: 2000
         default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
   schemas:
     RecordingAttachment:
       type: object

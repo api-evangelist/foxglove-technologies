@@ -237,6 +237,14 @@ paths:
       x-operation-id-source: derived
 components:
   parameters:
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
     sortOrder:
       in: query
       name: sortOrder
@@ -246,14 +254,6 @@ components:
         enum:
         - asc
         - desc
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
     limit:
       in: query
       name: limit

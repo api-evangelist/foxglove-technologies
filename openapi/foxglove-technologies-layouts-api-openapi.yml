@@ -297,20 +297,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    LayoutPermission:
-      type: string
-      enum:
-      - CREATOR_WRITE
-      - ORG_READ
-      - ORG_WRITE
-    GenericSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          const: true
-      required:
-      - success
     Error:
       type: object
       properties:
@@ -318,6 +304,12 @@ components:
           type: string
       required:
       - error
+    LayoutPermission:
+      type: string
+      enum:
+      - CREATOR_WRITE
+      - ORG_READ
+      - ORG_WRITE
     Layout:
       type: object
       properties:
@@ -359,6 +351,14 @@ components:
       - createdAt
       - updatedAt
       - permission
+    GenericSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+      required:
+      - success
   securitySchemes:
     Session:
       type: apiKey

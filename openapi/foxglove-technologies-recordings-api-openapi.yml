@@ -563,6 +563,47 @@ paths:
       operationId: postDataUpload
       x-operation-id-source: derived
 components:
+  parameters:
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
   schemas:
     RecordingImportStatus:
       type: string
@@ -591,19 +632,6 @@ components:
       - importing
       - failed
       - complete
-    DeviceSummary:
-      type: object
-      description: 'ID and name of a device.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
     PendingImport:
       properties:
         createdAt:
@@ -665,28 +693,9 @@ components:
       - requestId
       - updatedAt
       - siteId
-    PrimarySiteSummary:
+    DeviceSummary:
       type: object
-      description: 'ID and name of a primary site.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        indexingStrategy:
-          type: string
-          enum:
-          - split-files
-          - index-in-place
-      required:
-      - id
-      - name
-      - indexingStrategy
-    EdgeSiteSummary:
-      type: object
-      description: 'ID and name of an edge site.
+      description: 'ID and name of a device.
 
         '
       properties:
@@ -697,6 +706,21 @@ components:
       required:
       - id
       - name
+    RecordingMetadata:
+      type: object
+      description: 'MCAP metadata pertaining to a recording.
+
+        '
+      properties:
+        name:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - name
+      - metadata
     Recording:
       type: object
       description: 'A resource representing the content of an MCAP file or ROS bag managed by Foxglove.
@@ -774,62 +798,38 @@ components:
       - end
       - createdAt
       - importStatus
-    RecordingMetadata:
+    EdgeSiteSummary:
       type: object
-      description: 'MCAP metadata pertaining to a recording.
+      description: 'ID and name of an edge site.
 
         '
       properties:
+        id:
+          type: string
         name:
           type: string
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
       required:
+      - id
       - name
-      - metadata
-  parameters:
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
+    PrimarySiteSummary:
+      type: object
+      description: 'ID and name of a primary site.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        indexingStrategy:
+          type: string
+          enum:
+          - split-files
+          - index-in-place
+      required:
+      - id
+      - name
+      - indexingStrategy
   securitySchemes:
     Session:
       type: apiKey

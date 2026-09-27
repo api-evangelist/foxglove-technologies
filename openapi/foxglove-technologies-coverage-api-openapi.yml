@@ -144,6 +144,24 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    CoverageDeviceSummary:
+      allOf:
+      - $ref: '#/components/schemas/DeviceSummary'
+      - type: object
+        properties:
+          pendingCoverageUpdate:
+            type: object
+            optional: true
+            description: 'If the device has a pending coverage update, this object will contain the timestamp when the coverage refresh was last enqueued.
+
+              If null, the device has no pending coverage update.
+
+              '
+            properties:
+              nextInvalidationRequestedAt:
+                type: string
+                format: date-time
+                description: The timestamp when the device's coverage refresh was last enqueued.
     RecordingImportStatus:
       type: string
       description: 'The import status of recordings. Status will be one of:
@@ -184,24 +202,6 @@ components:
       required:
       - id
       - name
-    CoverageDeviceSummary:
-      allOf:
-      - $ref: '#/components/schemas/DeviceSummary'
-      - type: object
-        properties:
-          pendingCoverageUpdate:
-            type: object
-            optional: true
-            description: 'If the device has a pending coverage update, this object will contain the timestamp when the coverage refresh was last enqueued.
-
-              If null, the device has no pending coverage update.
-
-              '
-            properties:
-              nextInvalidationRequestedAt:
-                type: string
-                format: date-time
-                description: The timestamp when the device's coverage refresh was last enqueued.
     Coverage:
       type: object
       description: A coverage range represents a time span for which Foxglove has data for a given device. Recordings without devices are omitted except when queried by recording ID or import ID.

@@ -555,25 +555,88 @@ paths:
       operationId: getDevicesByNameOrIdPropertyTimeIntervalsById
       x-operation-id-source: derived
 components:
+  parameters:
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
   schemas:
+    DeviceRemoteAccessState:
+      type: object
     deviceName:
       type: string
       maxLength: 100
       description: The name of the device.
       pattern: ^[A-Za-z0-9_.-]+$
-    DeviceDetails:
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
+    DeviceCustomPropertyTimeInterval:
       type: object
       properties:
-        orgId:
+        id:
           type: string
-        createdAt:
+          description: ID of the property time interval.
+        deviceId:
           type: string
-          format: date
-        updatedAt:
+          description: ID of the associated device.
+        key:
+          type: string
+          description: Key of the property.
+        value:
+          description: Value of the property.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+            uniqueItems: true
+        start:
           type: string
           format: date-time
-    DeviceRemoteAccessState:
-      type: object
+          description: Inclusive start time this value was in effect.
+        end:
+          type: string
+          format: date-time
+          description: Exclusive end time this value was in effect. When absent the value is still in effect.
+      required:
+      - id
+      - deviceId
+      - key
+      - value
+      - start
     Device:
       type: object
       properties:
@@ -635,80 +698,17 @@ components:
       - remoteAccessEnabled
       - autoDeleteAfterImport
       - agentSupportsAutoDelete
-    CustomPropertyValues:
-      type: object
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: array
-          items:
-            type: string
-          uniqueItems: true
-    DeviceCustomPropertyTimeInterval:
+    DeviceDetails:
       type: object
       properties:
-        id:
+        orgId:
           type: string
-          description: ID of the property time interval.
-        deviceId:
+        createdAt:
           type: string
-          description: ID of the associated device.
-        key:
-          type: string
-          description: Key of the property.
-        value:
-          description: Value of the property.
-          oneOf:
-          - type: string
-          - type: number
-          - type: boolean
-          - type: array
-            items:
-              type: string
-            uniqueItems: true
-        start:
+          format: date
+        updatedAt:
           type: string
           format: date-time
-          description: Inclusive start time this value was in effect.
-        end:
-          type: string
-          format: date-time
-          description: Exclusive end time this value was in effect. When absent the value is still in effect.
-      required:
-      - id
-      - deviceId
-      - key
-      - value
-      - start
-  parameters:
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
   securitySchemes:
     Session:
       type: apiKey
