@@ -157,6 +157,22 @@ paths:
       x-operation-id-source: derived
 components:
   parameters:
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
     offset:
       in: query
       name: offset
@@ -181,22 +197,6 @@ components:
       schema:
         type: string
         format: date-time
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
   schemas:
     Topic:
       type: object

@@ -181,15 +181,6 @@ components:
         type: integer
         minimum: 0
         default: 0
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
     sortOrder:
       in: query
       name: sortOrder
@@ -199,6 +190,15 @@ components:
         enum:
         - asc
         - desc
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
   schemas:
     RecordingAttachment:
       type: object
