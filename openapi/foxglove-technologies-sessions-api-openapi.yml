@@ -268,39 +268,61 @@ paths:
       operationId: deleteSessionsByKeyOrId
       x-operation-id-source: derived
 components:
+  parameters:
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
   schemas:
-    RecordingSessionListItem:
-      allOf:
-      - $ref: '#/components/schemas/RecordingSession'
-      - type: object
-        properties:
-          recordingCount:
-            type: number
-            readOnly: true
-            description: Number of recordings associated with this session.
-          recordingStart:
-            type: string
-            format: date-time
-            readOnly: true
-            description: Earliest log time among visible recordings associated with this session.
-          recordingEnd:
-            type: string
-            format: date-time
-            readOnly: true
-            description: Latest log time among visible recordings associated with this session.
-        required:
-        - recordingCount
-    CustomPropertyValues:
+    DeviceSummary:
       type: object
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: array
-          items:
-            type: string
-          uniqueItems: true
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
     RecordingSession:
       type: object
       description: 'A recording session represents a logical grouping of recordings from a single device.
@@ -373,60 +395,38 @@ components:
       - createdAt
       - updatedAt
       - recordings
-    DeviceSummary:
+    CustomPropertyValues:
       type: object
-      description: 'ID and name of a device.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-  parameters:
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
+    RecordingSessionListItem:
+      allOf:
+      - $ref: '#/components/schemas/RecordingSession'
+      - type: object
+        properties:
+          recordingCount:
+            type: number
+            readOnly: true
+            description: Number of recordings associated with this session.
+          recordingStart:
+            type: string
+            format: date-time
+            readOnly: true
+            description: Earliest log time among visible recordings associated with this session.
+          recordingEnd:
+            type: string
+            format: date-time
+            readOnly: true
+            description: Latest log time among visible recordings associated with this session.
+        required:
+        - recordingCount
   securitySchemes:
     Session:
       type: apiKey

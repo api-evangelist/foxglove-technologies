@@ -168,6 +168,16 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    ExtensionWithSignedLink:
+      allOf:
+      - $ref: '#/components/schemas/Extension'
+      - type: object
+        properties:
+          foxe:
+            type: string
+            description: Signed download link for the extension
+        required:
+        - foxe
     Extension:
       type: object
       properties:
@@ -203,16 +213,6 @@ components:
       - description
       - activeVersion
       - sha256Sum
-    ExtensionWithSignedLink:
-      allOf:
-      - $ref: '#/components/schemas/Extension'
-      - type: object
-        properties:
-          foxe:
-            type: string
-            description: Signed download link for the extension
-        required:
-        - foxe
     Error:
       type: object
       properties:

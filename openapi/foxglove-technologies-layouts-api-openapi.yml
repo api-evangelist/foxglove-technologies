@@ -338,14 +338,6 @@ components:
       - createdAt
       - updatedAt
       - permission
-    GenericSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          const: true
-      required:
-      - success
     LayoutPermission:
       type: string
       enum:
@@ -359,6 +351,14 @@ components:
           type: string
       required:
       - error
+    GenericSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+      required:
+      - success
   securitySchemes:
     Session:
       type: apiKey

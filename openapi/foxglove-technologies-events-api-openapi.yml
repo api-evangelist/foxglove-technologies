@@ -276,24 +276,91 @@ paths:
       operationId: patchEventsById
       x-operation-id-source: derived
 components:
+  parameters:
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
   schemas:
-    EventUpdateInput:
+    EventUpdateEventTypeIdInput:
+      type: string
+      description: If provided, the event must conform to the event type's schema. An empty string will remove the event type.
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    EventDeleteResponse:
       type: object
       properties:
-        metadata:
-          $ref: '#/components/schemas/EventMetadataInput'
-        start:
+        id:
           type: string
-          description: Event start time (inclusive)
-          format: date-time
-        end:
-          type: string
-          description: Event end time (inclusive)
-          format: date-time
-        properties:
-          $ref: '#/components/schemas/EventUpdatePropertiesInput'
-        eventTypeId:
-          $ref: '#/components/schemas/EventUpdateEventTypeIdInput'
+          description: ID of the deleted event.
+      required:
+      - id
+    EventMetadataInput:
+      type: object
+      additionalProperties:
+        type: string
+      required: []
+      description: An object with user-defined string keys and string values; key order is not preserved
+    EventUpdatePropertiesInput:
+      description: 'A key-value map, where each key is one of your pre-defined event custom property keys.
+
+        Keys which are not recognized as custom properties will be ignored.
+
+        Keys which are not included in the request, but exist on the event, will be unchanged.
+
+        To unset a property, pass `null` as the value.
+
+        '
+      type: object
+      additionalProperties: true
+      required: []
     Event:
       type: object
       properties:
@@ -347,27 +414,6 @@ components:
       - metadata
       - createdAt
       - updatedAt
-    EventUpdatePropertiesInput:
-      description: 'A key-value map, where each key is one of your pre-defined event custom property keys.
-
-        Keys which are not recognized as custom properties will be ignored.
-
-        Keys which are not included in the request, but exist on the event, will be unchanged.
-
-        To unset a property, pass `null` as the value.
-
-        '
-      type: object
-      additionalProperties: true
-      required: []
-    EventDeleteResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID of the deleted event.
-      required:
-      - id
     CustomPropertyValues:
       type: object
       additionalProperties:
@@ -379,6 +425,23 @@ components:
           items:
             type: string
           uniqueItems: true
+    EventUpdateInput:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/EventMetadataInput'
+        start:
+          type: string
+          description: Event start time (inclusive)
+          format: date-time
+        end:
+          type: string
+          description: Event end time (inclusive)
+          format: date-time
+        properties:
+          $ref: '#/components/schemas/EventUpdatePropertiesInput'
+        eventTypeId:
+          $ref: '#/components/schemas/EventUpdateEventTypeIdInput'
     EventCreateInput:
       type: object
       properties:
@@ -423,69 +486,6 @@ components:
       required:
       - start
       - end
-    EventUpdateEventTypeIdInput:
-      type: string
-      description: If provided, the event must conform to the event type's schema. An empty string will remove the event type.
-    DeviceSummary:
-      type: object
-      description: 'ID and name of a device.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-    EventMetadataInput:
-      type: object
-      additionalProperties:
-        type: string
-      required: []
-      description: An object with user-defined string keys and string values; key order is not preserved
-  parameters:
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
   securitySchemes:
     Session:
       type: apiKey

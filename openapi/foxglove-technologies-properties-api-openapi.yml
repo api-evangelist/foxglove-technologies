@@ -237,23 +237,6 @@ paths:
       x-operation-id-source: derived
 components:
   parameters:
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
     limit:
       in: query
       name: limit
@@ -263,6 +246,23 @@ components:
         minimum: 0
         maximum: 2000
         default: 2000
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   schemas:
     DeviceCustomPropertyTimeInterval:
       type: object

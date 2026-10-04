@@ -143,7 +143,62 @@ paths:
       operationId: getDataCoverage
       x-operation-id-source: derived
 components:
+  parameters:
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
   schemas:
+    RecordingImportStatus:
+      type: string
+      description: 'The import status of recordings. Status will be one of:
+
+        - `none`: The recording has not yet been imported, and import has not been requested.
+
+        - `pending`: Foxglove has received a request to import this recording.
+
+        - `importing`: The recording data is being processed for access via Foxglove.
+
+        - `failed`: The recording data could not be imported.
+
+        - `complete`: The contents of the recording are available for access via Foxglove.
+
+
+        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
+
+
+        The set of `importStatus` values may expand in the future.
+
+        '
+      enum:
+      - none
+      - pending
+      - importing
+      - failed
+      - complete
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
     CoverageDeviceSummary:
       allOf:
       - $ref: '#/components/schemas/DeviceSummary'
@@ -194,61 +249,6 @@ components:
       - start
       - end
       - status
-    DeviceSummary:
-      type: object
-      description: 'ID and name of a device.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-    RecordingImportStatus:
-      type: string
-      description: 'The import status of recordings. Status will be one of:
-
-        - `none`: The recording has not yet been imported, and import has not been requested.
-
-        - `pending`: Foxglove has received a request to import this recording.
-
-        - `importing`: The recording data is being processed for access via Foxglove.
-
-        - `failed`: The recording data could not be imported.
-
-        - `complete`: The contents of the recording are available for access via Foxglove.
-
-
-        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
-
-
-        The set of `importStatus` values may expand in the future.
-
-        '
-      enum:
-      - none
-      - pending
-      - importing
-      - failed
-      - complete
-  parameters:
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
   securitySchemes:
     Session:
       type: apiKey

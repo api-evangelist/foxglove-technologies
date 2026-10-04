@@ -173,6 +173,15 @@ paths:
       x-operation-id-source: derived
 components:
   parameters:
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
     offset:
       in: query
       name: offset
@@ -190,15 +199,6 @@ components:
         enum:
         - asc
         - desc
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
   schemas:
     RecordingAttachment:
       type: object

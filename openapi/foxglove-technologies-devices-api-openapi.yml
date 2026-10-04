@@ -556,35 +556,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    DeviceDetails:
-      type: object
-      properties:
-        orgId:
-          type: string
-        createdAt:
-          type: string
-          format: date
-        updatedAt:
-          type: string
-          format: date-time
-    deviceName:
-      type: string
-      maxLength: 100
-      description: The name of the device.
-      pattern: ^[A-Za-z0-9_.-]+$
-    DeviceRemoteAccessState:
-      type: object
-    CustomPropertyValues:
-      type: object
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: array
-          items:
-            type: string
-          uniqueItems: true
     DeviceCustomPropertyTimeInterval:
       type: object
       properties:
@@ -621,6 +592,35 @@ components:
       - key
       - value
       - start
+    DeviceRemoteAccessState:
+      type: object
+    DeviceDetails:
+      type: object
+      properties:
+        orgId:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date-time
+    deviceName:
+      type: string
+      maxLength: 100
+      description: The name of the device.
+      pattern: ^[A-Za-z0-9_.-]+$
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
     Device:
       type: object
       properties:
@@ -692,14 +692,6 @@ components:
         minimum: 0
         maximum: 2000
         default: 2000
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
     sortOrder:
       in: query
       name: sortOrder
@@ -709,6 +701,14 @@ components:
         enum:
         - asc
         - desc
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   securitySchemes:
     Session:
       type: apiKey
