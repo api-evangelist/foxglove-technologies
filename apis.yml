@@ -44,6 +44,9 @@ specificationVersion: '0.23'
 image: https://foxglove.dev/images/logo-icon-round.png
 created: '2026-08-16'
 modified: '2026-08-16'
+x-docs-platform: docusaurus
+x-docs-platform-confidence: medium
+x-docs-platform-checked: 2026-10-03
 tags:
 - Robotics
 - Observability
