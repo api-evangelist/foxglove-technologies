@@ -15,3 +15,38 @@
   relationship: distribution-channel
   status: not-a-workflow
   arazzo: null
+- slug: foxglove-technologies-open-robotics-ros-package-index
+  label: Open Robotics (ROS package index)
+  partner_name: Open Robotics (ROS package index)
+  category: ROS packages
+  type: register
+  channel: standard-directory
+  evidence: https://github.com/foxglove/foxglove-sdk.git
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: ROS 2 rosdistro (repo.ros2.org/rosdistro_cache)
+    spec_file: null
+    standard: ROS 2
+    role: ros-package-maintainer
+    matched_domain: foxglove.dev
+    matched_by: domain
+    source_owner: foxglove
+    distros:
+    - humble
+    - jazzy
+    - kilted
+    - rolling
+    packages: 6
+    sample_packages:
+    - foxglove_bridge
+    - foxglove_msgs
+    - mcap_vendor
+    - rosbag2_storage_mcap
+    - rosbag2_storage_mcap_testdata
+    - rosbag2_test_msgdefs
+    signal_note: 'participation only: packages/distros are context, never read'
+    detected_by: sweep-industrial-robotics.py
+    detected: '2026-10-15'
+  status: not-a-workflow
+  arazzo: null
