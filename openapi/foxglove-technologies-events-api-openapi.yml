@@ -284,6 +284,21 @@ components:
       schema:
         type: string
         format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
     limit:
       in: query
       name: limit
@@ -302,52 +317,7 @@ components:
         enum:
         - asc
         - desc
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
   schemas:
-    EventUpdateEventTypeIdInput:
-      type: string
-      description: If provided, the event must conform to the event type's schema. An empty string will remove the event type.
-    DeviceSummary:
-      type: object
-      description: 'ID and name of a device.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-    EventDeleteResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID of the deleted event.
-      required:
-      - id
-    EventMetadataInput:
-      type: object
-      additionalProperties:
-        type: string
-      required: []
-      description: An object with user-defined string keys and string values; key order is not preserved
     EventUpdatePropertiesInput:
       description: 'A key-value map, where each key is one of your pre-defined event custom property keys.
 
@@ -361,6 +331,12 @@ components:
       type: object
       additionalProperties: true
       required: []
+    EventMetadataInput:
+      type: object
+      additionalProperties:
+        type: string
+      required: []
+      description: An object with user-defined string keys and string values; key order is not preserved
     Event:
       type: object
       properties:
@@ -414,17 +390,6 @@ components:
       - metadata
       - createdAt
       - updatedAt
-    CustomPropertyValues:
-      type: object
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: array
-          items:
-            type: string
-          uniqueItems: true
     EventUpdateInput:
       type: object
       properties:
@@ -442,6 +407,22 @@ components:
           $ref: '#/components/schemas/EventUpdatePropertiesInput'
         eventTypeId:
           $ref: '#/components/schemas/EventUpdateEventTypeIdInput'
+    EventUpdateEventTypeIdInput:
+      type: string
+      description: If provided, the event must conform to the event type's schema. An empty string will remove the event type.
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
     EventCreateInput:
       type: object
       properties:
@@ -486,6 +467,25 @@ components:
       required:
       - start
       - end
+    EventDeleteResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the deleted event.
+      required:
+      - id
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
   securitySchemes:
     Session:
       type: apiKey

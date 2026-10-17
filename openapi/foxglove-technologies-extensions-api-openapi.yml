@@ -168,6 +168,13 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
     ExtensionWithSignedLink:
       allOf:
       - $ref: '#/components/schemas/Extension'
@@ -213,13 +220,6 @@ components:
       - description
       - activeVersion
       - sha256Sum
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-      - error
   securitySchemes:
     Session:
       type: apiKey

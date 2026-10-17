@@ -102,6 +102,14 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    GenericSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+      required:
+      - success
     SiteToken:
       type: object
       description: A SiteToken resource provides site controllers with authentication to the api.
@@ -120,14 +128,6 @@ components:
       - id
       - createdAt
       - siteId
-    GenericSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          const: true
-      required:
-      - success
   securitySchemes:
     Session:
       type: apiKey

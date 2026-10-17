@@ -556,44 +556,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    DeviceCustomPropertyTimeInterval:
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID of the property time interval.
-        deviceId:
-          type: string
-          description: ID of the associated device.
-        key:
-          type: string
-          description: Key of the property.
-        value:
-          description: Value of the property.
-          oneOf:
-          - type: string
-          - type: number
-          - type: boolean
-          - type: array
-            items:
-              type: string
-            uniqueItems: true
-        start:
-          type: string
-          format: date-time
-          description: Inclusive start time this value was in effect.
-        end:
-          type: string
-          format: date-time
-          description: Exclusive end time this value was in effect. When absent the value is still in effect.
-      required:
-      - id
-      - deviceId
-      - key
-      - value
-      - start
-    DeviceRemoteAccessState:
-      type: object
     DeviceDetails:
       type: object
       properties:
@@ -605,22 +567,8 @@ components:
         updatedAt:
           type: string
           format: date-time
-    deviceName:
-      type: string
-      maxLength: 100
-      description: The name of the device.
-      pattern: ^[A-Za-z0-9_.-]+$
-    CustomPropertyValues:
+    DeviceRemoteAccessState:
       type: object
-      additionalProperties:
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: array
-          items:
-            type: string
-          uniqueItems: true
     Device:
       type: object
       properties:
@@ -682,7 +630,67 @@ components:
       - remoteAccessEnabled
       - autoDeleteAfterImport
       - agentSupportsAutoDelete
+    DeviceCustomPropertyTimeInterval:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the property time interval.
+        deviceId:
+          type: string
+          description: ID of the associated device.
+        key:
+          type: string
+          description: Key of the property.
+        value:
+          description: Value of the property.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+            uniqueItems: true
+        start:
+          type: string
+          format: date-time
+          description: Inclusive start time this value was in effect.
+        end:
+          type: string
+          format: date-time
+          description: Exclusive end time this value was in effect. When absent the value is still in effect.
+      required:
+      - id
+      - deviceId
+      - key
+      - value
+      - start
+    deviceName:
+      type: string
+      maxLength: 100
+      description: The name of the device.
+      pattern: ^[A-Za-z0-9_.-]+$
+    CustomPropertyValues:
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            type: string
+          uniqueItems: true
   parameters:
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
     limit:
       in: query
       name: limit
@@ -701,14 +709,6 @@ components:
         enum:
         - asc
         - desc
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
   securitySchemes:
     Session:
       type: apiKey

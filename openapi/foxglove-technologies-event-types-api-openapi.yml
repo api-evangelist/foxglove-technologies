@@ -171,6 +171,18 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    EventTypeCustomProperty:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the custom property
+        required:
+          type: boolean
+          description: Whether the custom property is required for this event type
+      required:
+      - id
+      - required
     EventType:
       type: object
       properties:
@@ -201,18 +213,6 @@ components:
       - name
       - createdAt
       - updatedAt
-    EventTypeCustomProperty:
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID of the custom property
-        required:
-          type: boolean
-          description: Whether the custom property is required for this event type
-      required:
-      - id
-      - required
   securitySchemes:
     Session:
       type: apiKey

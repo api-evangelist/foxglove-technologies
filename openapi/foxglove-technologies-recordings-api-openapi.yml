@@ -563,78 +563,10 @@ paths:
       operationId: postDataUpload
       x-operation-id-source: derived
 components:
-  parameters:
-    start:
-      in: query
-      name: start
-      description: Start of an inclusive time range
-      schema:
-        type: string
-        format: date-time
-    limit:
-      in: query
-      name: limit
-      description: Maximum number of items to return
-      schema:
-        type: number
-        minimum: 0
-        maximum: 2000
-        default: 2000
-    offset:
-      in: query
-      name: offset
-      description: Number of items to skip before returning the results
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    sortOrder:
-      in: query
-      name: sortOrder
-      description: Sort order for the `sortBy` field
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-    end:
-      in: query
-      name: end
-      description: End of an inclusive time range
-      schema:
-        type: string
-        format: date-time
   schemas:
-    RecordingImportStatus:
-      type: string
-      description: 'The import status of recordings. Status will be one of:
-
-        - `none`: The recording has not yet been imported, and import has not been requested.
-
-        - `pending`: Foxglove has received a request to import this recording.
-
-        - `importing`: The recording data is being processed for access via Foxglove.
-
-        - `failed`: The recording data could not be imported.
-
-        - `complete`: The contents of the recording are available for access via Foxglove.
-
-
-        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
-
-
-        The set of `importStatus` values may expand in the future.
-
-        '
-      enum:
-      - none
-      - pending
-      - importing
-      - failed
-      - complete
-    DeviceSummary:
+    PrimarySiteSummary:
       type: object
-      description: 'ID and name of a device.
+      description: 'ID and name of a primary site.
 
         '
       properties:
@@ -642,70 +574,15 @@ components:
           type: string
         name:
           type: string
+        indexingStrategy:
+          type: string
+          enum:
+          - split-files
+          - index-in-place
       required:
       - id
       - name
-    PendingImport:
-      properties:
-        createdAt:
-          type: string
-          format: date-time
-          description: When the pending import was created
-        deviceId:
-          type: string
-          description: ID of device
-        deviceName:
-          type: string
-          description: Name of the device from which the import originated
-        error:
-          type: string
-          description: Error message, if status is "error"
-        filename:
-          type: string
-          description: Filename of the import
-        importId:
-          type: string
-          description: ID of import; undefined until status is "complete"
-        orgId:
-          type: string
-          description: ID of org to which the import belongs
-        pipelineStage:
-          type: string
-          description: stage in the import pipeline the import currently occupies
-        requestId:
-          type: string
-          description: ID of the import request
-        projectId:
-          type: string
-          description: ID of the project to which the import belongs
-        siteId:
-          type: string
-          description: ID of Primary Site where import will be stored
-        status:
-          type: string
-          description: Status of initiated import
-          enum:
-          - received
-          - processing
-          - ready for indexing
-          - error
-          - complete
-        updatedAt:
-          type: string
-          format: date-time
-          description: When the pending import was last updated
-        quarantinedAt:
-          type: string
-          format: date-time
-          description: When the pending import was quarantined
-      required:
-      - createdAt
-      - filename
-      - orgId
-      - pipelineStage
-      - requestId
-      - updatedAt
-      - siteId
+      - indexingStrategy
     Recording:
       type: object
       description: 'A resource representing the content of an MCAP file or ROS bag managed by Foxglove.
@@ -783,6 +660,67 @@ components:
       - end
       - createdAt
       - importStatus
+    PendingImport:
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: When the pending import was created
+        deviceId:
+          type: string
+          description: ID of device
+        deviceName:
+          type: string
+          description: Name of the device from which the import originated
+        error:
+          type: string
+          description: Error message, if status is "error"
+        filename:
+          type: string
+          description: Filename of the import
+        importId:
+          type: string
+          description: ID of import; undefined until status is "complete"
+        orgId:
+          type: string
+          description: ID of org to which the import belongs
+        pipelineStage:
+          type: string
+          description: stage in the import pipeline the import currently occupies
+        requestId:
+          type: string
+          description: ID of the import request
+        projectId:
+          type: string
+          description: ID of the project to which the import belongs
+        siteId:
+          type: string
+          description: ID of Primary Site where import will be stored
+        status:
+          type: string
+          description: Status of initiated import
+          enum:
+          - received
+          - processing
+          - ready for indexing
+          - error
+          - complete
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the pending import was last updated
+        quarantinedAt:
+          type: string
+          format: date-time
+          description: When the pending import was quarantined
+      required:
+      - createdAt
+      - filename
+      - orgId
+      - pipelineStage
+      - requestId
+      - updatedAt
+      - siteId
     RecordingMetadata:
       type: object
       description: 'MCAP metadata pertaining to a recording.
@@ -798,6 +736,46 @@ components:
       required:
       - name
       - metadata
+    RecordingImportStatus:
+      type: string
+      description: 'The import status of recordings. Status will be one of:
+
+        - `none`: The recording has not yet been imported, and import has not been requested.
+
+        - `pending`: Foxglove has received a request to import this recording.
+
+        - `importing`: The recording data is being processed for access via Foxglove.
+
+        - `failed`: The recording data could not be imported.
+
+        - `complete`: The contents of the recording are available for access via Foxglove.
+
+
+        Note: `none` and `pending` statuses are applicable only to recordings originating from an Edge Site or a device running Foxlet.
+
+
+        The set of `importStatus` values may expand in the future.
+
+        '
+      enum:
+      - none
+      - pending
+      - importing
+      - failed
+      - complete
+    DeviceSummary:
+      type: object
+      description: 'ID and name of a device.
+
+        '
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
     EdgeSiteSummary:
       type: object
       description: 'ID and name of an edge site.
@@ -811,25 +789,47 @@ components:
       required:
       - id
       - name
-    PrimarySiteSummary:
-      type: object
-      description: 'ID and name of a primary site.
-
-        '
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        indexingStrategy:
-          type: string
-          enum:
-          - split-files
-          - index-in-place
-      required:
-      - id
-      - name
-      - indexingStrategy
+  parameters:
+    start:
+      in: query
+      name: start
+      description: Start of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    offset:
+      in: query
+      name: offset
+      description: Number of items to skip before returning the results
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    limit:
+      in: query
+      name: limit
+      description: Maximum number of items to return
+      schema:
+        type: number
+        minimum: 0
+        maximum: 2000
+        default: 2000
+    end:
+      in: query
+      name: end
+      description: End of an inclusive time range
+      schema:
+        type: string
+        format: date-time
+    sortOrder:
+      in: query
+      name: sortOrder
+      description: Sort order for the `sortBy` field
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
   securitySchemes:
     Session:
       type: apiKey

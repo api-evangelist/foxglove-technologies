@@ -169,6 +169,18 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    CustomProperty:
+      type: object
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: ID of the custom property
+        required:
+        - id
+        - hasAssociatedData
+      - $ref: '#/components/schemas/NewCustomProperty'
     NewCustomProperty:
       type: object
       properties:
@@ -229,18 +241,6 @@ components:
       - label
       - resourceType
       - valueType
-    CustomProperty:
-      type: object
-      allOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            description: ID of the custom property
-        required:
-        - id
-        - hasAssociatedData
-      - $ref: '#/components/schemas/NewCustomProperty'
   securitySchemes:
     Session:
       type: apiKey
