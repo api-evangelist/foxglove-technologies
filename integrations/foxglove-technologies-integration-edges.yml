@@ -1,13 +1,20 @@
 generated: '2026-10-13'
 method: searched
 checked:
+- https://api.nuget.org/v3
 - https://azuremarketplace.microsoft.com/
+- https://crates.io/api/v1
 - https://marketplace.odva.org/organizations
 - https://opcfoundation.org/products/
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
 - https://repo.ros2.org/rosdistro_cache/humble-cache.yaml.gz
 - https://repo.ros2.org/rosdistro_cache/jazzy-cache.yaml.gz
 - https://repo.ros2.org/rosdistro_cache/kilted-cache.yaml.gz
 - https://repo.ros2.org/rosdistro_cache/rolling-cache.yaml.gz
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
 marketplace_apps: []
 edges:
 - partner_name: Microsoft Azure Marketplace
@@ -60,6 +67,156 @@ edges:
     detected: '2026-10-15'
   detected_by: sweep-industrial-robotics.py
   first_seen: '2026-10-15'
+- partner_name: Go module proxy
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official SDK (Go)
+  evidence: https://pkg.go.dev/github.com/foxglove/foxglove-cli
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Go module proxy (public registry JSON)
+    spec_file: null
+    language: Go
+    packages:
+    - name: github.com/foxglove/foxglove-cli
+      version: v2.0.0+incompatible
+      released: '2026-10-08'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/foxglove/foxglove-cli
+      repo_leg: github-org:foxglove
+      publisher_leg: org:foxglove
+      matched_by: github-org
+    - name: github.com/foxglove/mcap/go/mcap
+      version: v1.9.0
+      released: '2026-06-12'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/foxglove/mcap/go/mcap
+      repo_leg: github-org:foxglove
+      publisher_leg: org:foxglove
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@foxglove/cdr
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@foxglove/cdr'
+      version: 3.5.1
+      released: '2026-05-25'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/cdr
+      repo_leg: github-org:foxglove
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/embed'
+      version: 0.85.0
+      released: '2026-10-02'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/embed
+      repo_leg: domain:foxglove.dev
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/embed-react'
+      version: 0.85.0
+      released: '2026-10-02'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/embed-react
+      repo_leg: domain:foxglove.dev
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/extension'
+      version: 3.4.0
+      released: '2026-10-13'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/extension
+      repo_leg: domain:foxglove.dev
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/omgidl-parser'
+      version: 1.2.2
+      released: '2025-10-13'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/omgidl-parser
+      repo_leg: github-org:foxglove
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/rosmsg'
+      version: 5.0.5
+      released: '2025-10-13'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/rosmsg
+      repo_leg: github-org:foxglove
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/schemas'
+      version: 2.3.1
+      released: '2026-09-29'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/schemas
+      repo_leg: github-org:foxglove
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@foxglove/ws-protocol'
+      version: 0.8.0
+      released: '2025-03-13'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@foxglove/ws-protocol
+      repo_leg: domain:foxglove.dev
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@mcap/core'
+      version: 2.3.0
+      released: '2026-09-25'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@mcap/core
+      repo_leg: domain:foxglove.dev
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    - name: '@mcap/support'
+      version: 1.1.0
+      released: '2026-02-17'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@mcap/support
+      repo_leg: domain:foxglove.dev
+      publisher_leg: email:foxglove.dev
+      matched_by: domain
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
 source:
 - https://opcfoundation.org/products/
 - https://marketplace.odva.org/organizations
