@@ -3,7 +3,12 @@ method: searched
 checked:
 - https://api.nuget.org/v3
 - https://azuremarketplace.microsoft.com/
+- https://cdn.winget.microsoft.com/cache
 - https://crates.io/api/v1
+- https://formulae.brew.sh/api/cask.json
+- https://formulae.brew.sh/api/formula.json
+- https://github.com/ScoopInstaller/Extras
+- https://github.com/ScoopInstaller/Main
 - https://marketplace.odva.org/organizations
 - https://opcfoundation.org/products/
 - https://proxy.golang.org
@@ -32,41 +37,6 @@ edges:
   seller_name: Foxglove Technologies Inc.
   detected_by: sweep-cloud-marketplaces.py
   detected: '2026-10-13'
-- partner_name: Open Robotics (ROS package index)
-  partner: null
-  partner_match: register
-  type: register
-  direction: partner-built
-  category: ROS packages
-  evidence: https://github.com/foxglove/foxglove-sdk.git
-  channel: standard-directory
-  relationship: standard-participant
-  contract_reference:
-    register: ROS 2 rosdistro (repo.ros2.org/rosdistro_cache)
-    spec_file: null
-    standard: ROS 2
-    role: ros-package-maintainer
-    matched_domain: foxglove.dev
-    matched_by: domain
-    source_owner: foxglove
-    distros:
-    - humble
-    - jazzy
-    - kilted
-    - rolling
-    packages: 6
-    sample_packages:
-    - foxglove_bridge
-    - foxglove_msgs
-    - mcap_vendor
-    - rosbag2_storage_mcap
-    - rosbag2_storage_mcap_testdata
-    - rosbag2_test_msgdefs
-    signal_note: 'participation only: packages/distros are context, never read'
-    detected_by: sweep-industrial-robotics.py
-    detected: '2026-10-15'
-  detected_by: sweep-industrial-robotics.py
-  first_seen: '2026-10-15'
 - partner_name: Go module proxy
   partner: null
   partner_match: null
@@ -217,6 +187,71 @@ edges:
     detected: '2026-10-18'
   detected_by: sweep-official-sdks.py
   first_seen: '2026-10-18'
+- partner_name: Homebrew
+  partner: homebrew
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official CLI (Homebrew)
+  evidence: https://formulae.brew.sh/formula/foxglove-cli
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Homebrew (public package index)
+    spec_file: null
+    packages:
+    - name: foxglove-cli
+      kind: formula
+      version: 2.0.0
+      released: null
+      lapsed: false
+      page: https://formulae.brew.sh/formula/foxglove-cli
+      cli: 'formula desc: Foxglove command-line tool'
+      repo_leg: github-org:foxglove
+      publisher_leg: artifact-github-org:foxglove
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool on a package manager: distribution, not an integration;
+      lapsed = no release in 24 months or deprecated / disabled by the manager'
+    detected_by: sweep-official-clis.py
+    detected: '2026-10-20'
+  detected_by: sweep-official-clis.py
+  first_seen: '2026-10-20'
+- partner_name: Open Robotics (ROS package index)
+  partner: null
+  partner_match: register
+  type: register
+  direction: partner-built
+  category: ROS packages
+  evidence: https://github.com/foxglove/foxglove-sdk.git
+  channel: standard-directory
+  relationship: standard-participant
+  contract_reference:
+    register: ROS 2 rosdistro (repo.ros2.org/rosdistro_cache)
+    spec_file: null
+    standard: ROS 2
+    role: ros-package-maintainer
+    matched_domain: foxglove.dev
+    matched_by: domain
+    source_owner: foxglove
+    distros:
+    - humble
+    - jazzy
+    - kilted
+    - rolling
+    packages: 6
+    sample_packages:
+    - foxglove_bridge
+    - foxglove_msgs
+    - mcap_vendor
+    - rosbag2_storage_mcap
+    - rosbag2_storage_mcap_testdata
+    - rosbag2_test_msgdefs
+    signal_note: 'participation only: packages/distros are context, never read'
+    detected_by: sweep-industrial-robotics.py
+    detected: '2026-10-15'
+  detected_by: sweep-industrial-robotics.py
+  first_seen: '2026-10-15'
 source:
 - https://opcfoundation.org/products/
 - https://marketplace.odva.org/organizations
