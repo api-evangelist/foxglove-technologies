@@ -20,6 +20,9 @@ checked:
 - https://formulae.brew.sh/api/formula.json
 - https://github.com/ScoopInstaller/Extras
 - https://github.com/ScoopInstaller/Main
+- https://aur.archlinux.org/cgit/aur.git/tree/.SRCINFO
+- https://aur.archlinux.org/packages-meta-ext-v1.json.gz
+- https://aur.archlinux.org/rpc/v5/info
 marketplace_apps: []
 edges:
 - partner_name: Microsoft Azure Marketplace
@@ -252,6 +255,40 @@ edges:
     detected: '2026-10-20'
   detected_by: sweep-official-clis.py
   first_seen: '2026-10-20'
+- partner_name: Arch User Repository (AUR)
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official CLI (Arch User Repository (AUR))
+  evidence: https://aur.archlinux.org/packages/mcap-cli-bin
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Arch User Repository (AUR) (public package index)
+    spec_file: null
+    packages:
+    - name: mcap-cli-bin
+      kind: aur
+      version: 0.4.0-1
+      released: '2026-10-16'
+      released_field: AUR LastModified
+      out_of_date: false
+      lapsed: false
+      page: https://aur.archlinux.org/packages/mcap-cli-bin
+      upstream: https://github.com/foxglove/mcap
+      cli: 'AUR description: MCAP is a modular container format and logging library for pub/sub messages with'
+      repo_leg: github-org:foxglove
+      publisher_leg: artifact-github-org:foxglove
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool packaged for Arch Linux (community-maintained PKGBUILD whose
+      upstream and source artifact are the provider''s): distribution, not an integration; lapsed = flagged out-of-date
+      or not updated in 24 months'
+    detected_by: sweep-aur-vendor-cli-packages.py
+    detected: '2026-10-23'
+  detected_by: sweep-aur-vendor-cli-packages.py
+  first_seen: '2026-10-23'
 source:
 - https://opcfoundation.org/products/
 - https://marketplace.odva.org/organizations
